@@ -1,6 +1,6 @@
 // Axyronis renderer process
 // -------------------------
-// This file runs inside the desktop UI. It owns the virtual desktop shell:
+// This file runs inside the computer-style desktop UI. It owns the virtual shell:
 // app registry, windows, menus, panels, and the built-in educational apps.
 // Native Windows actions are never called directly here; they go through
 // window.axyronisNative, which is provided by preload.js in Electron mode.
@@ -148,7 +148,7 @@ const wallpaperPresets = [
 ];
 
 const defaultPreferences = {
-  systemName: "Axyronis OS",
+  systemName: "Axyronis Computer System",
   desktopBrand: "Axyronis",
   userName: "Axyronis User",
   deviceName: "Axyronis Workstation",
@@ -876,7 +876,7 @@ function renderBrowser() {
         <p>${value || "axyronis://home"}</p>
       </section>
       <div class="portal-grid">
-        <article class="portal-card"><h3>System Vision</h3><p>A personal desktop environment focused on speed, privacy, customization, and visual polish.</p></article>
+        <article class="portal-card"><h3>System Vision</h3><p>A personal virtual computer system focused on speed, privacy, customization, and visual polish.</p></article>
         <article class="portal-card"><h3>Current Focus</h3><p>Desktop, windows, files, terminal, settings, browser, and monitor are interactive.</p></article>
         <article class="portal-card"><h3>Next Layer</h3><p>The desktop edition can launch real Windows apps and connect to local files.</p></article>
       </div>
@@ -1148,7 +1148,7 @@ function renderTerminal() {
     else if (name === "clear") lines.length = 0;
     else if (name === "date") lines.push(new Date().toLocaleString("en-US"));
     else if (name === "apps") lines.push(apps.map(app => app.name).join(", "));
-    else if (name === "about") lines.push("Axyronis is your personal virtual desktop environment.");
+    else if (name === "about") lines.push("Axyronis is your personal virtual computer system.");
     else if (name === "theme") lines.push(`accent=${state.accent} light=${state.lightMode}`);
     else if (name === "echo") lines.push(args.join(" "));
     else if (nativeAPI && command) {
@@ -1173,7 +1173,7 @@ function renderNotes() {
   toolbar.append(status, save, clear);
   const area = document.createElement("textarea");
   area.className = "note-pad";
-  area.value = localStorage.getItem("axyronis-notes") || "Axyronis system ideas:\n- A clean personal desktop\n- Built-in files, settings, terminal, and browser\n- Real Windows app launching in desktop mode\n";
+  area.value = localStorage.getItem("axyronis-notes") || "Axyronis computer system ideas:\n- A clean desktop computer experience\n- Built-in files, settings, terminal, and browser\n- Real Windows app launching in desktop mode\n";
   save.addEventListener("click", () => {
     localStorage.setItem("axyronis-notes", area.value);
     status.textContent = "Saved " + new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
@@ -1287,7 +1287,7 @@ function renderSettings() {
         actionSetting("Open Architecture Notes", "Open Docs", () => openApp("about"))
       ]);
       const note = div("developer-note");
-      note.textContent = "You may rename the system, replace the brand, reorganize files, rewrite the UI, add native APIs, or turn Axyronis into a completely different educational desktop. Keep safety notes visible when exposing native power.";
+      note.textContent = "You may rename the system, replace the brand, reorganize files, rewrite the UI, add native APIs, or turn Axyronis into a completely different educational computer system. Keep safety notes visible when exposing native power.";
       block.append(note);
       panel.append(block);
     }
@@ -1522,8 +1522,8 @@ function renderAbout() {
   const root = div("app-layout");
   root.innerHTML = `
     <section class="portal-hero">
-      <h2>Axyronis OS</h2>
-      <p>Your personal desktop environment is online.</p>
+      <h2>Axyronis Computer System</h2>
+      <p>Your personal virtual computer system is online.</p>
     </section>
     <div class="portal-grid">
       <article class="portal-card"><h3>Desktop Experience</h3><p>Start menu, taskbar, desktop icons, and multi-window control.</p></article>

@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for improving Axyronis OS. This project is intended to be easy to study and remix.
+Thanks for improving Axyronis Computer System. This project is intended to be easy to study and remix.
 
 ## Good Contributions
 

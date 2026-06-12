@@ -1,14 +1,14 @@
 {
   "name": "axyronis-os",
   "version": "1.0.0",
-  "description": "Axyronis personal desktop environment",
+  "description": "Axyronis personal virtual computer system",
   "main": "electron-main.js",
   "private": true,
   "author": "Yuheng0426",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Yuheng0426/Virtual-computer-Axyronis.git"
+    "url": "https://github.com/Yuheng0426/Axyronis-Computer-System.git"
   },
   "keywords": [
     "electron",

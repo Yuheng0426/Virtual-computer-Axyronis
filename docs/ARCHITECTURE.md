@@ -1,4 +1,4 @@
-# Axyronis Architecture
+# Axyronis Computer System Architecture
 
 This document explains the project for learners and remixers.
 
@@ -12,7 +12,7 @@ styles.css
   Visual language, window chrome, taskbar, panels, desktop icons, and responsive rules.
 
 app.js
-  Renderer-side desktop environment:
+  Renderer-side computer desktop:
   - app registry
   - window manager
   - start menu

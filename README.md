@@ -1,6 +1,6 @@
-# Axyronis OS
+# Axyronis Computer System
 
-Axyronis OS is an educational virtual desktop environment built with HTML, CSS, JavaScript, and Electron. It is not a real operating system kernel. It is a Windows-hosted desktop shell experiment designed for learning, UI prototyping, and creative remixing.
+Axyronis Computer System is an educational virtual computer system built with HTML, CSS, JavaScript, and Electron. It is not a phone OS, not a real operating system kernel, and not a replacement for Windows. It is a Windows-hosted computer desktop shell experiment designed for learning, UI prototyping, and creative remixing.
 
 ![Axyronis command palette](AxyronisOS/preview-english-command-palette.png)
 
@@ -16,7 +16,7 @@ Axyronis can launch real Windows programs when running in Electron mode, so trea
 
 ## Ongoing Updates
 
-I will keep updating and improving this system over time. The goal is to make Axyronis more useful for learners, remixers, UI designers, and people studying how a virtual desktop environment can be built.
+I will keep updating and improving this computer system over time. The goal is to make Axyronis more useful for learners, remixers, UI designers, and people studying how a virtual computer desktop can be built.
 
 Released versions are published with Git tags so users can download different versions. The current version is `v1.0.0`, the Settings wallpaper and identity release. Future feature releases will continue as `v1.1.0`, `v1.2.0`, and so on.
 
@@ -131,7 +131,7 @@ AxyronisOS/
 
 ## Safety Notes
 
-- Axyronis is a desktop shell experiment, not a replacement for Windows.
+- Axyronis is a virtual computer shell experiment, not a replacement for Windows.
 - Native mode can run real commands and open real programs.
 - Do not run destructive commands unless you understand them.
 - Keep `nodeIntegration` disabled and use `preload.js` for native APIs.
