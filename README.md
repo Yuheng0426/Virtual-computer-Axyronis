@@ -8,8 +8,6 @@ Axyronis Computer System is an educational virtual computer system built with HT
 
 ![Axyronis wallpaper settings](AxyronisComputerSystem/preview-settings-wallpaper-v1.png)
 
-![Axyronis internal Chrome](AxyronisComputerSystem/preview-internal-chrome-v1.png)
-
 ## Project Statement
 
 This project is shared for learning, research, and secondary creation. You may study how it works, modify the interface, add apps, redesign the desktop, or use it as a starting point for your own virtual computer environment.
