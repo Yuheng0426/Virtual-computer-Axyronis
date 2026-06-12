@@ -10,6 +10,7 @@ contextBridge.exposeInMainWorld("axyronisNative", {
   isElectron: true,
   getSystemInfo: () => ipcRenderer.invoke("system:getInfo"),
   pickFolder: () => ipcRenderer.invoke("fs:pickFolder"),
+  pickWallpaper: () => ipcRenderer.invoke("wallpaper:pickImage"),
   listDir: path => ipcRenderer.invoke("fs:listDir", path),
   openPath: path => ipcRenderer.invoke("fs:openPath", path),
   openExternal: url => ipcRenderer.invoke("shell:openExternal", url),

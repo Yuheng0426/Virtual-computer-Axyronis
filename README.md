@@ -12,6 +12,12 @@ This project is shared for learning, research, and secondary creation. You may s
 
 Axyronis can launch real Windows programs when running in Electron mode, so treat the terminal and app launcher with the same care you would use in Windows itself.
 
+## Ongoing Updates
+
+I will keep updating and improving this system over time. The goal is to make Axyronis more useful for learners, remixers, UI designers, and people studying how a virtual desktop environment can be built.
+
+Released versions are published with Git tags so users can download different versions. The current version is `v1.0.0`, the Wallpaper Studio release. Future feature releases will continue as `v1.1.0`, `v1.2.0`, and so on.
+
 ## Remix Freedom
 
 You are welcome to make major changes. You may rename the system, replace the Axyronis brand, reorganize files, rewrite the UI, add or remove apps, change the architecture, build a new shell on top of it, or use pieces of the code for research and learning.
@@ -31,6 +37,7 @@ The Settings app includes an Identity section so users can rename the system, de
 - One-click Power Workspace layout from the Command Palette.
 - Advanced Settings app with Identity, Appearance, Desktop, Startup, and Developer sections.
 - User-editable system name, desktop brand, user name, device name, and boot subtitle.
+- Wallpaper Studio with built-in presets and local image selection in Electron mode.
 
 ## Settings Are The Core
 
@@ -49,6 +56,16 @@ Current settings include:
 - Glass Blur
 - Startup Mode
 - Developer freedom notes
+
+## Version Downloads
+
+Users can download different versions from GitHub tags or releases.
+
+- `v1.0.0`: Wallpaper Studio release.
+- `v1.1.0`: Reserved for the next feature update.
+- `v1.2.0`: Reserved for later feature updates.
+
+Use `main` for the newest development version.
 
 ## Run It
 
@@ -104,6 +121,7 @@ AxyronisOS/
 - Change default names and settings in `defaultPreferences` inside `AxyronisOS/app.js`.
 - Add Command Palette actions in `getCommands()` inside `AxyronisOS/app.js`.
 - Add Quick Center controls in `index.html` and style them in `styles.css`.
+- Add wallpaper presets in `wallpaperPresets` inside `AxyronisOS/app.js`.
 
 ## Safety Notes
 

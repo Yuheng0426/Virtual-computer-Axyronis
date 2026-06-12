@@ -92,3 +92,33 @@ renderSettings()       Builds the Settings app UI
 ```
 
 For a major remix, start by changing `defaultPreferences`, the `apps` array, and the design tokens in `styles.css`.
+
+## Wallpaper System
+
+Wallpaper presets live in `wallpaperPresets` inside `app.js`.
+
+The active wallpaper is stored in preferences:
+
+```text
+wallpaperPreset   Current built-in preset id or local-file marker
+wallpaperImage    CSS background image value
+wallpaperSource   Human-readable source text
+```
+
+Electron mode can select a local image through:
+
+```text
+app.js -> preload.js -> electron-main.js -> wallpaper:pickImage
+```
+
+Browser mode can preview a selected image for the current session with a blob URL. It does not persist the file after reload.
+
+## Versioning
+
+The repository uses Git tags for downloadable versions.
+
+```text
+v1.0.0   Wallpaper Studio release
+v1.1.0   Next feature update
+v1.2.0   Later feature update
+```

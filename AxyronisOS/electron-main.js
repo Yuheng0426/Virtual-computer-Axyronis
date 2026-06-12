@@ -9,6 +9,7 @@ const path = require("path");
 const fs = require("fs/promises");
 const fsSync = require("fs");
 const os = require("os");
+const { pathToFileURL } = require("url");
 const { exec, spawn } = require("child_process");
 
 let mainWindow;
@@ -103,6 +104,23 @@ ipcMain.handle("fs:pickFolder", async () => {
   });
   if (result.canceled || !result.filePaths[0]) return null;
   return result.filePaths[0];
+});
+
+ipcMain.handle("wallpaper:pickImage", async () => {
+  // Returns a file URL that the renderer can safely place into CSS. The image
+  // itself remains on the user's machine and is not copied into the project.
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ["openFile"],
+    filters: [
+      { name: "Images", extensions: ["png", "jpg", "jpeg", "webp", "bmp", "gif"] }
+    ]
+  });
+  if (result.canceled || !result.filePaths[0]) return null;
+  const imagePath = result.filePaths[0];
+  return {
+    path: imagePath,
+    url: pathToFileURL(imagePath).toString()
+  };
 });
 
 ipcMain.handle("fs:listDir", async (_event, targetPath) => {

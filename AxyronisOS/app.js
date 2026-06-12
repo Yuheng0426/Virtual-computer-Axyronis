@@ -68,6 +68,14 @@ const apps = [
     render: renderSettings
   },
   {
+    id: "wallpaper",
+    name: "Wallpaper Studio",
+    symbol: "B",
+    desktop: true,
+    size: [760, 520],
+    render: renderWallpaperStudio
+  },
+  {
     id: "system",
     name: "System Monitor",
     symbol: "M",
@@ -120,6 +128,33 @@ const files = {
 };
 
 // Central UI state. Keeping this small makes the desktop easier to remix.
+const wallpaperPresets = [
+  {
+    id: "axyronis-grid",
+    name: "Axyronis Grid",
+    image: 'url("./assets/axyronis-wallpaper.png")',
+    preview: "radial-gradient(circle at 22% 30%, rgba(51,224,194,0.38), transparent 24%), radial-gradient(circle at 74% 38%, rgba(255,95,162,0.28), transparent 26%), linear-gradient(135deg, #08121a, #171528 48%, #08241f)"
+  },
+  {
+    id: "midnight-lab",
+    name: "Midnight Lab",
+    image: "radial-gradient(circle at 22% 24%, rgba(51,224,194,0.42), transparent 28%), radial-gradient(circle at 80% 35%, rgba(255,95,162,0.32), transparent 30%), linear-gradient(135deg, #070a12, #151526 48%, #061b18)",
+    preview: "radial-gradient(circle at 22% 24%, rgba(51,224,194,0.42), transparent 28%), radial-gradient(circle at 80% 35%, rgba(255,95,162,0.32), transparent 30%), linear-gradient(135deg, #070a12, #151526 48%, #061b18)"
+  },
+  {
+    id: "solar-array",
+    name: "Solar Array",
+    image: "radial-gradient(circle at 42% 70%, rgba(255,200,87,0.36), transparent 26%), radial-gradient(circle at 78% 25%, rgba(124,140,255,0.3), transparent 28%), linear-gradient(135deg, #0a1016, #261524 45%, #10201c)",
+    preview: "radial-gradient(circle at 42% 70%, rgba(255,200,87,0.36), transparent 26%), radial-gradient(circle at 78% 25%, rgba(124,140,255,0.3), transparent 28%), linear-gradient(135deg, #0a1016, #261524 45%, #10201c)"
+  },
+  {
+    id: "clean-slate",
+    name: "Clean Slate",
+    image: "linear-gradient(135deg, #111827, #172033 44%, #0f2a2a)",
+    preview: "linear-gradient(135deg, #111827, #172033 44%, #0f2a2a)"
+  }
+];
+
 const defaultPreferences = {
   systemName: "Axyronis OS",
   desktopBrand: "Axyronis",
@@ -129,6 +164,9 @@ const defaultPreferences = {
   accent: "#33e0c2",
   lightMode: false,
   wallpaperDim: 20,
+  wallpaperPreset: "axyronis-grid",
+  wallpaperImage: wallpaperPresets[0].image,
+  wallpaperSource: "Built-in preset",
   glassBlur: 30,
   startupMode: "clean"
 };
@@ -190,6 +228,7 @@ function applyPreferences() {
   state.lightMode = preferences.lightMode;
   document.title = preferences.systemName;
   document.documentElement.style.setProperty("--accent", preferences.accent);
+  document.documentElement.style.setProperty("--wallpaper-image", preferences.wallpaperImage);
   document.documentElement.style.setProperty("--wallpaper-dim", String(preferences.wallpaperDim / 100));
   document.documentElement.style.setProperty("--glass-blur", `${preferences.glassBlur}px`);
   document.body.classList.toggle("light-mode", preferences.lightMode);
@@ -214,6 +253,7 @@ function resetPreferences() {
   renderDesktopIcons();
   renderStartMenu();
   refreshOpenSettingsPanels();
+  refreshOpenWallpaperPanels();
   showToast("Preferences reset");
 }
 
@@ -228,6 +268,14 @@ function refreshOpenSettingsPanels() {
   const body = $(".window-body", entry.el);
   body.innerHTML = "";
   body.append(renderSettings());
+}
+
+function refreshOpenWallpaperPanels() {
+  const entry = state.windows.get("wallpaper");
+  if (!entry) return;
+  const body = $(".window-body", entry.el);
+  body.innerHTML = "";
+  body.append(renderWallpaperStudio());
 }
 
 function wireGlobalEvents() {
@@ -416,6 +464,11 @@ function getCommands() {
       title: "Toggle Quick Center",
       detail: "Network, focus, and display controls",
       run: toggleQuickCenter
+    },
+    {
+      title: "Open Wallpaper Studio",
+      detail: "Change desktop wallpaper and presets",
+      run: () => openApp("wallpaper")
     },
     {
       title: "Refresh Desktop",
@@ -984,6 +1037,93 @@ function renderWindowsApps() {
   return root;
 }
 
+function renderWallpaperStudio() {
+  const root = div("app-layout");
+  const header = div("native-launch-hero");
+  header.innerHTML = `
+    <div class="icon-tile">B</div>
+    <div>
+      <h2>Wallpaper Studio</h2>
+      <p>Change the desktop background with presets or a local image.</p>
+    </div>
+  `;
+
+  const status = div("file-preview");
+  status.innerHTML = `<strong>Current Source</strong><p>${escapeHtml(preferences.wallpaperSource)}</p>`;
+
+  const presetGrid = div("wallpaper-grid");
+  wallpaperPresets.forEach(preset => {
+    const card = document.createElement("button");
+    card.className = `wallpaper-card ${preferences.wallpaperPreset === preset.id ? "active" : ""}`;
+    card.innerHTML = `
+      <span class="wallpaper-preview" style="--preview-wallpaper:${preset.preview}"></span>
+      <strong>${preset.name}</strong>
+      <small>Built-in preset</small>
+    `;
+    card.addEventListener("click", () => {
+      preferences.wallpaperPreset = preset.id;
+      preferences.wallpaperImage = preset.image;
+      preferences.wallpaperSource = preset.name;
+      savePreferences();
+      applyPreferences();
+      refreshOpenWallpaperPanels();
+      showToast(`Wallpaper set: ${preset.name}`);
+    });
+    presetGrid.append(card);
+  });
+
+  const actions = div("toolbar");
+  const chooseLocal = button("Choose Local Image", "text-button primary");
+  const reset = button("Restore Default", "text-button");
+  const browserUpload = document.createElement("input");
+  browserUpload.type = "file";
+  browserUpload.accept = "image/*";
+  browserUpload.className = "wallpaper-upload";
+
+  chooseLocal.addEventListener("click", async () => {
+    if (nativeAPI) {
+      const picked = await nativeAPI.pickWallpaper();
+      if (!picked) return;
+      preferences.wallpaperPreset = "local-file";
+      preferences.wallpaperImage = `url("${picked.url}")`;
+      preferences.wallpaperSource = picked.path;
+      savePreferences();
+      applyPreferences();
+      refreshOpenWallpaperPanels();
+      showToast("Local wallpaper applied");
+      return;
+    }
+    browserUpload.click();
+  });
+
+  browserUpload.addEventListener("change", () => {
+    const file = browserUpload.files?.[0];
+    if (!file) return;
+    const objectUrl = URL.createObjectURL(file);
+    preferences.wallpaperPreset = "browser-preview";
+    preferences.wallpaperImage = `url("${objectUrl}")`;
+    preferences.wallpaperSource = `${file.name} (session preview)`;
+    applyPreferences();
+    refreshOpenWallpaperPanels();
+    showToast("Session wallpaper preview applied");
+  });
+
+  reset.addEventListener("click", () => {
+    const preset = wallpaperPresets[0];
+    preferences.wallpaperPreset = preset.id;
+    preferences.wallpaperImage = preset.image;
+    preferences.wallpaperSource = preset.name;
+    savePreferences();
+    applyPreferences();
+    refreshOpenWallpaperPanels();
+    showToast("Default wallpaper restored");
+  });
+
+  actions.append(chooseLocal, reset, browserUpload);
+  root.append(header, presetGrid, actions, status);
+  return root;
+}
+
 function renderTerminal() {
   // Built-in commands work everywhere. In Electron mode, unknown commands are
   // passed to the native bridge and executed on the host system.
@@ -1116,6 +1256,7 @@ function renderSettings() {
 
     if (active === "desktop") {
       panel.append(settingsBlock("Desktop Behavior", "Small shell controls that are useful for remixers.", [
+        actionSetting("Open Wallpaper Studio", "Open", () => openApp("wallpaper")),
         actionSetting("Open Command Palette", "Launch", openCommandPalette),
         actionSetting("Arrange Power Workspace", "Arrange", openPowerWorkspace),
         actionSetting("Refresh Desktop Icons", "Refresh", refreshDesktop)
