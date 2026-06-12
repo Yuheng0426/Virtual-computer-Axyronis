@@ -74,3 +74,21 @@ app.js -> preload.js -> electron-main.js -> Windows
 ```
 
 Only expose methods that the UI actually needs.
+
+## Settings System
+
+Default user-facing identity and theme values live in `defaultPreferences` inside `app.js`.
+
+The Settings app stores changes in `localStorage` under `axyronis-preferences`. This keeps experiments local and makes it easy to reset or remix without a backend.
+
+Useful entry points:
+
+```text
+defaultPreferences     Default system name, user name, theme, and startup mode
+loadPreferences()      Reads saved local settings
+savePreferences()      Persists settings
+applyPreferences()     Applies settings to the live desktop
+renderSettings()       Builds the Settings app UI
+```
+
+For a major remix, start by changing `defaultPreferences`, the `apps` array, and the design tokens in `styles.css`.

@@ -64,7 +64,7 @@ const apps = [
     name: "Settings",
     symbol: "S",
     desktop: true,
-    size: [740, 520],
+    size: [860, 560],
     render: renderSettings
   },
   {
@@ -120,14 +120,29 @@ const files = {
 };
 
 // Central UI state. Keeping this small makes the desktop easier to remix.
+const defaultPreferences = {
+  systemName: "Axyronis OS",
+  desktopBrand: "Axyronis",
+  userName: "Axyronis User",
+  deviceName: "Axyronis Workstation",
+  bootSubtitle: "Personal Computing Environment",
+  accent: "#33e0c2",
+  lightMode: false,
+  wallpaperDim: 20,
+  glassBlur: 30,
+  startupMode: "clean"
+};
+
+const preferences = loadPreferences();
+
 const state = {
   windows: new Map(),
   z: 30,
   active: null,
   startOpen: false,
   fileLocation: "Desktop",
-  accent: localStorage.getItem("axyronis-accent") || "#33e0c2",
-  lightMode: localStorage.getItem("axyronis-light") === "true"
+  accent: preferences.accent,
+  lightMode: preferences.lightMode
 };
 
 const $ = (selector, root = document) => root.querySelector(selector);
@@ -138,8 +153,7 @@ const appById = id => apps.find(app => app.id === id);
 const nativeAPI = window.axyronisNative || null;
 
 document.addEventListener("DOMContentLoaded", () => {
-  document.documentElement.style.setProperty("--accent", state.accent);
-  document.body.classList.toggle("light-mode", state.lightMode);
+  applyPreferences();
   boot();
   renderDesktopIcons();
   renderStartMenu();
@@ -154,7 +168,66 @@ function boot() {
   setTimeout(() => {
     $("#boot").classList.add("is-hidden");
     $("#os").classList.remove("is-hidden");
+    runStartupMode();
   }, 1700);
+}
+
+function loadPreferences() {
+  try {
+    const stored = JSON.parse(localStorage.getItem("axyronis-preferences") || "{}");
+    return { ...defaultPreferences, ...stored };
+  } catch {
+    return { ...defaultPreferences };
+  }
+}
+
+function savePreferences() {
+  localStorage.setItem("axyronis-preferences", JSON.stringify(preferences));
+}
+
+function applyPreferences() {
+  state.accent = preferences.accent;
+  state.lightMode = preferences.lightMode;
+  document.title = preferences.systemName;
+  document.documentElement.style.setProperty("--accent", preferences.accent);
+  document.documentElement.style.setProperty("--wallpaper-dim", String(preferences.wallpaperDim / 100));
+  document.documentElement.style.setProperty("--glass-blur", `${preferences.glassBlur}px`);
+  document.body.classList.toggle("light-mode", preferences.lightMode);
+  $(".boot-title").textContent = preferences.desktopBrand;
+  $(".boot-subtitle").textContent = preferences.bootSubtitle;
+  $(".desktop-brand span:last-child").textContent = preferences.desktopBrand;
+  $(".user-chip strong").textContent = preferences.userName;
+  $(".user-chip span").textContent = preferences.deviceName;
+}
+
+function updatePreference(key, value) {
+  preferences[key] = value;
+  savePreferences();
+  applyPreferences();
+  refreshOpenSettingsPanels();
+}
+
+function resetPreferences() {
+  Object.assign(preferences, defaultPreferences);
+  savePreferences();
+  applyPreferences();
+  renderDesktopIcons();
+  renderStartMenu();
+  refreshOpenSettingsPanels();
+  showToast("Preferences reset");
+}
+
+function runStartupMode() {
+  if (preferences.startupMode === "welcome") openApp("about");
+  if (preferences.startupMode === "workspace") openPowerWorkspace();
+}
+
+function refreshOpenSettingsPanels() {
+  const entry = state.windows.get("settings");
+  if (!entry) return;
+  const body = $(".window-body", entry.el);
+  body.innerHTML = "";
+  body.append(renderSettings());
 }
 
 function wireGlobalEvents() {
@@ -935,7 +1008,7 @@ function renderTerminal() {
     const [name, ...args] = command.split(" ");
     if (name === "help") lines.push("help, clear, date, apps, about, theme, echo");
     else if (name === "clear") lines.length = 0;
-    else if (name === "date") lines.push(new Date().toLocaleString("zh-CN"));
+    else if (name === "date") lines.push(new Date().toLocaleString("en-US"));
     else if (name === "apps") lines.push(apps.map(app => app.name).join(", "));
     else if (name === "about") lines.push("Axyronis is your personal virtual desktop environment.");
     else if (name === "theme") lines.push(`accent=${state.accent} light=${state.lightMode}`);
@@ -979,56 +1052,173 @@ function renderNotes() {
 function renderSettings() {
   // Settings are intentionally local and simple. This makes them easy to study
   // and safe to change during UI experiments.
-  const root = div("app-layout");
-  const grid = div("settings-grid");
+  const root = div("app-layout two-column settings-shell");
+  const sidebar = div("sidebar");
+  const panel = div("settings-panel");
   const accents = ["#33e0c2", "#ff5fa2", "#ffc857", "#7c8cff", "#65f283"];
+  const sections = [
+    ["identity", "Identity"],
+    ["appearance", "Appearance"],
+    ["desktop", "Desktop"],
+    ["startup", "Startup"],
+    ["developer", "Developer"]
+  ];
+  let active = "identity";
 
-  grid.innerHTML = `
-    <section class="setting-block">
-      <h3>Appearance</h3>
-      <p>Adjust the Axyronis accent color and light mode.</p>
-      <div class="settings-row"><span>Light Mode</span><button id="lightToggle" class="toggle ${state.lightMode ? "on" : ""}" title="Light Mode"></button></div>
-      <div class="settings-row"><span>Accent Color</span><div class="swatches"></div></div>
-    </section>
-    <section class="setting-block">
-      <h3>Performance</h3>
-      <p>Virtual performance mode affects System Monitor visualization.</p>
-      <div class="settings-row"><span>Performance Tier</span><input id="perf" type="range" min="1" max="5" value="4" /></div>
-    </section>
-    <section class="setting-block">
-      <h3>Privacy</h3>
-      <p>Notes and preferences are stored locally on this machine.</p>
-      <div class="settings-row"><span>Local First</span><button class="toggle on" title="Local First"></button></div>
-    </section>
-    <section class="setting-block">
-      <h3>System Info</h3>
-      <p>Axyronis OS Prototype 1.0<br />Build AX-0612</p>
-    </section>
-  `;
-
-  const swatches = $(".swatches", grid);
-  accents.forEach(color => {
-    const swatch = document.createElement("button");
-    swatch.className = "swatch";
-    swatch.style.background = color;
-    swatch.title = color;
-    swatch.addEventListener("click", () => {
-      state.accent = color;
-      localStorage.setItem("axyronis-accent", color);
-      document.documentElement.style.setProperty("--accent", color);
+  const drawSidebar = () => {
+    sidebar.innerHTML = "";
+    sections.forEach(([id, label]) => {
+      const item = document.createElement("button");
+      item.className = id === active ? "active" : "";
+      item.textContent = label;
+      item.addEventListener("click", () => {
+        active = id;
+        drawSidebar();
+        drawPanel();
+      });
+      sidebar.append(item);
     });
-    swatches.append(swatch);
-  });
+  };
 
-  $("#lightToggle", grid).addEventListener("click", event => {
-    state.lightMode = !state.lightMode;
-    localStorage.setItem("axyronis-light", String(state.lightMode));
-    document.body.classList.toggle("light-mode", state.lightMode);
-    event.currentTarget.classList.toggle("on", state.lightMode);
-  });
+  const drawPanel = () => {
+    panel.innerHTML = "";
+    if (active === "identity") {
+      panel.append(settingsBlock("System Identity", "Rename the system for your own remix or research build.", [
+        textSetting("System Name", "systemName"),
+        textSetting("Desktop Brand", "desktopBrand"),
+        textSetting("User Name", "userName"),
+        textSetting("Device Name", "deviceName"),
+        textSetting("Boot Subtitle", "bootSubtitle")
+      ]));
+    }
 
-  root.append(grid);
+    if (active === "appearance") {
+      const block = settingsBlock("Appearance", "Tune the visual language without touching CSS.", [
+        toggleSetting("Light Mode", "lightMode"),
+        rangeSetting("Wallpaper Dim", "wallpaperDim", 0, 70),
+        rangeSetting("Glass Blur", "glassBlur", 12, 48)
+      ]);
+      const colorRow = div("settings-row");
+      colorRow.innerHTML = "<span>Accent Color</span>";
+      const swatches = div("swatches");
+      accents.forEach(color => {
+        const swatch = document.createElement("button");
+        swatch.className = "swatch";
+        swatch.style.background = color;
+        swatch.title = color;
+        swatch.addEventListener("click", () => updatePreference("accent", color));
+        swatches.append(swatch);
+      });
+      colorRow.append(swatches);
+      block.append(colorRow);
+      panel.append(block);
+    }
+
+    if (active === "desktop") {
+      panel.append(settingsBlock("Desktop Behavior", "Small shell controls that are useful for remixers.", [
+        actionSetting("Open Command Palette", "Launch", openCommandPalette),
+        actionSetting("Arrange Power Workspace", "Arrange", openPowerWorkspace),
+        actionSetting("Refresh Desktop Icons", "Refresh", refreshDesktop)
+      ]));
+    }
+
+    if (active === "startup") {
+      panel.append(settingsBlock("Startup", "Choose what Axyronis opens after the boot animation.", [
+        selectSetting("Startup Mode", "startupMode", [
+          ["clean", "Clean Desktop"],
+          ["welcome", "Welcome Window"],
+          ["workspace", "Power Workspace"]
+        ]),
+        actionSetting("Reset Preferences", "Reset", resetPreferences)
+      ]));
+    }
+
+    if (active === "developer") {
+      const block = settingsBlock("Developer Freedom", "This project is intentionally open for major rewrites.", [
+        actionSetting("Open Architecture Notes", "Open Docs", () => openApp("about"))
+      ]);
+      const note = div("developer-note");
+      note.textContent = "You may rename the system, replace the brand, reorganize files, rewrite the UI, add native APIs, or turn Axyronis into a completely different educational desktop. Keep safety notes visible when exposing native power.";
+      block.append(note);
+      panel.append(block);
+    }
+  };
+
+  drawSidebar();
+  drawPanel();
+  root.append(sidebar, panel);
   return root;
+}
+
+function settingsBlock(title, description, rows) {
+  const block = div("setting-block wide");
+  block.innerHTML = `<h3>${title}</h3><p>${description}</p>`;
+  rows.forEach(row => block.append(row));
+  return block;
+}
+
+function textSetting(label, key) {
+  const row = div("settings-row");
+  const input = document.createElement("input");
+  input.value = preferences[key];
+  input.maxLength = 42;
+  input.addEventListener("change", () => updatePreference(key, input.value.trim() || defaultPreferences[key]));
+  row.append(labelNode(label), input);
+  return row;
+}
+
+function toggleSetting(label, key) {
+  const row = div("settings-row");
+  const toggle = button("", `toggle ${preferences[key] ? "on" : ""}`);
+  toggle.title = label;
+  toggle.addEventListener("click", () => updatePreference(key, !preferences[key]));
+  row.append(labelNode(label), toggle);
+  return row;
+}
+
+function rangeSetting(label, key, min, max) {
+  const row = div("settings-row");
+  const input = document.createElement("input");
+  input.type = "range";
+  input.min = min;
+  input.max = max;
+  input.value = preferences[key];
+  input.addEventListener("input", () => {
+    preferences[key] = Number(input.value);
+    savePreferences();
+    applyPreferences();
+  });
+  row.append(labelNode(label), input);
+  return row;
+}
+
+function selectSetting(label, key, options) {
+  const row = div("settings-row");
+  const select = document.createElement("select");
+  options.forEach(([value, text]) => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = text;
+    option.selected = preferences[key] === value;
+    select.append(option);
+  });
+  select.addEventListener("change", () => updatePreference(key, select.value));
+  row.append(labelNode(label), select);
+  return row;
+}
+
+function actionSetting(label, actionLabel, action) {
+  const row = div("settings-row");
+  const actionButton = button(actionLabel, "text-button primary");
+  actionButton.addEventListener("click", action);
+  row.append(labelNode(label), actionButton);
+  return row;
+}
+
+function labelNode(text) {
+  const span = document.createElement("span");
+  span.textContent = text;
+  return span;
 }
 
 function renderSystem() {

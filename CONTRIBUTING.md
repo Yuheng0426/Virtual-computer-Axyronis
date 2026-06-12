@@ -11,6 +11,10 @@ Thanks for improving Axyronis OS. This project is intended to be easy to study a
 - Cleaner themes, wallpapers, and visual systems.
 - Refactors that make secondary creation easier.
 
+## Major Remixing Is Allowed
+
+Large rewrites are welcome. You may rename the project, replace the brand, redesign the UI, split the code into modules, change the app registry, add a plugin system, or build a new educational desktop from this base. Please keep safety documentation clear if your version exposes native system power.
+
 ## Development Checklist
 
 Before submitting changes:

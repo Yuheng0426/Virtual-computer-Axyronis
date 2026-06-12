@@ -20,6 +20,8 @@
   --danger: #ff5c66;
   --shadow: 0 24px 80px rgba(0, 0, 0, 0.48);
   --soft-shadow: 0 12px 36px rgba(0, 0, 0, 0.32);
+  --wallpaper-dim: 0.2;
+  --glass-blur: 30px;
   --radius: 8px;
   color-scheme: dark;
   font-family:
@@ -133,7 +135,7 @@ button {
 .desktop {
   overflow: hidden;
   background:
-    linear-gradient(rgba(5, 7, 12, 0.2), rgba(5, 7, 12, 0.36)),
+    linear-gradient(rgba(5, 7, 12, var(--wallpaper-dim)), rgba(5, 7, 12, calc(var(--wallpaper-dim) + 0.16))),
     url("./assets/axyronis-wallpaper.png") center / cover no-repeat,
     radial-gradient(circle at 12% 18%, rgba(51, 224, 194, 0.38), transparent 25%),
     linear-gradient(135deg, #0b0d13, #151122 45%, #061817);
@@ -321,7 +323,7 @@ button {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.018)),
     var(--panel);
-  backdrop-filter: blur(30px) saturate(150%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
   box-shadow: var(--shadow);
   border-radius: var(--radius);
   animation: windowIn 150ms ease both;
@@ -970,8 +972,22 @@ button {
   gap: 10px;
 }
 
+.settings-shell {
+  grid-template-columns: 170px minmax(0, 1fr);
+  align-items: start;
+}
+
+.settings-panel {
+  display: grid;
+  gap: 10px;
+}
+
 .setting-block {
   padding: 14px;
+}
+
+.setting-block.wide {
+  grid-column: 1 / -1;
 }
 
 .setting-block h3,
@@ -990,6 +1006,30 @@ button {
 .settings-row {
   justify-content: space-between;
   margin-top: 12px;
+}
+
+.settings-row input,
+.settings-row select {
+  width: min(260px, 52%);
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  outline: 0;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 7px;
+}
+
+.settings-row input[type="range"] {
+  padding: 0;
+}
+
+.developer-note {
+  padding: 12px;
+  color: var(--muted);
+  background: rgba(51, 224, 194, 0.1);
+  border: 1px solid rgba(51, 224, 194, 0.22);
+  border-radius: var(--radius);
 }
 
 .swatches {

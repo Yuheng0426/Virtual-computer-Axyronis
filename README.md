@@ -4,11 +4,19 @@ Axyronis OS is an educational virtual desktop environment built with HTML, CSS, 
 
 ![Axyronis command palette](AxyronisOS/preview-english-command-palette.png)
 
+![Axyronis advanced settings](AxyronisOS/preview-advanced-settings.png)
+
 ## Project Statement
 
 This project is shared for learning, research, and secondary creation. You may study how it works, modify the interface, add apps, redesign the desktop, or use it as a starting point for your own virtual computer environment.
 
 Axyronis can launch real Windows programs when running in Electron mode, so treat the terminal and app launcher with the same care you would use in Windows itself.
+
+## Remix Freedom
+
+You are welcome to make major changes. You may rename the system, replace the Axyronis brand, reorganize files, rewrite the UI, add or remove apps, change the architecture, build a new shell on top of it, or use pieces of the code for research and learning.
+
+The Settings app includes an Identity section so users can rename the system, desktop brand, user name, device name, and boot subtitle without editing source code. This is meant to encourage experimentation and secondary creation.
 
 ## What It Can Do
 
@@ -21,6 +29,26 @@ Axyronis can launch real Windows programs when running in Electron mode, so trea
 - Command Palette, available from the `CMD` taskbar button or `Ctrl + K`.
 - Quick Center, available from the `QC` taskbar button or `Ctrl + Q`.
 - One-click Power Workspace layout from the Command Palette.
+- Advanced Settings app with Identity, Appearance, Desktop, Startup, and Developer sections.
+- User-editable system name, desktop brand, user name, device name, and boot subtitle.
+
+## Settings Are The Core
+
+The Settings app is designed as the most important part of the system. It lets learners change identity, appearance, desktop behavior, startup behavior, and developer/remix options without touching the source first.
+
+Current settings include:
+
+- System Name
+- Desktop Brand
+- User Name
+- Device Name
+- Boot Subtitle
+- Accent Color
+- Light Mode
+- Wallpaper Dim
+- Glass Blur
+- Startup Mode
+- Developer freedom notes
 
 ## Run It
 
@@ -73,6 +101,7 @@ AxyronisOS/
 - Add a new built-in app in `AxyronisOS/app.js` by adding an entry to the `apps` array and writing a `renderYourApp()` function.
 - Add a real Windows launcher in `AxyronisOS/electron-main.js` by extending the `windowsApps` object.
 - Change the desktop theme in `AxyronisOS/styles.css`, especially the `:root` variables.
+- Change default names and settings in `defaultPreferences` inside `AxyronisOS/app.js`.
 - Add Command Palette actions in `getCommands()` inside `AxyronisOS/app.js`.
 - Add Quick Center controls in `index.html` and style them in `styles.css`.
 

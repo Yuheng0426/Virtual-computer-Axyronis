@@ -5,3 +5,5 @@ Axyronis OS is an educational virtual desktop environment. It is not a real oper
 When running in Electron desktop mode, Axyronis can launch real Windows applications and execute commands through the controlled native bridge. Anything launched from Axyronis runs on the host computer with the permissions of the current user.
 
 Use this project for learning, prototyping, research, and creative remixing. Review code before running changes from others.
+
+The project intentionally permits major modification. A modified version may behave very differently from this repository, especially if native launchers or command execution are changed. Review forks and remixes before running them.
