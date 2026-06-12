@@ -4,7 +4,8 @@ This project uses Git tags so learners can download different versions over time
 
 ## v1.0.0 - Settings Wallpaper and Identity Release
 
-- Rebuilt Settings into a Windows-inspired layered app with Home, categories, and detail pages.
+- Rebuilt Settings into an Axyronis layered control center with Home, categories, and detail pages.
+- Expanded Settings to fill the desktop workspace and redesigned it with a more original Axyronis control-center layout.
 - Added display language switching inside Settings, with instant shell refresh.
 - Changed the Google Chrome desktop icon to open an internal Axyronis browser window instead of leaving the system.
 - Added wallpaper controls inside Settings.

@@ -63,7 +63,7 @@ const apps = [
     name: "Settings",
     symbol: "S",
     desktop: true,
-    size: [1040, 680],
+    size: [1320, 820],
     render: renderSettings
   },
   {
@@ -251,7 +251,7 @@ const locales = {
       "settings.gaming": "Gaming",
       "settings.accessibility": "Accessibility",
       "settings.privacy": "Privacy & security",
-      "settings.update": "Windows Update",
+      "settings.update": "System Updates",
       "settings.developer": "Developer",
       "settings.display": "Display",
       "settings.sound": "Sound",
@@ -369,7 +369,7 @@ const locales = {
       "settings.gaming": "游戏",
       "settings.accessibility": "辅助功能",
       "settings.privacy": "隐私和安全性",
-      "settings.update": "Windows 更新",
+      "settings.update": "系统更新",
       "settings.developer": "开发者",
       "settings.display": "显示",
       "settings.sound": "声音",
@@ -990,11 +990,12 @@ function openWindowApp(app) {
   const template = $("#windowTemplate").content.firstElementChild.cloneNode(true);
   const [width, height] = app.size;
   const offset = state.windows.size * 28;
+  const roomySettings = id === "settings";
   template.dataset.app = id;
-  template.style.width = `${Math.min(width, window.innerWidth - 24)}px`;
-  template.style.height = `${Math.min(height, window.innerHeight - 96)}px`;
-  template.style.left = `${Math.max(12, 160 + offset)}px`;
-  template.style.top = `${Math.max(12, 96 + offset)}px`;
+  template.style.width = `${roomySettings ? Math.max(860, window.innerWidth - 28) : Math.min(width, window.innerWidth - 24)}px`;
+  template.style.height = `${roomySettings ? Math.max(620, window.innerHeight - 92) : Math.min(height, window.innerHeight - 96)}px`;
+  template.style.left = `${roomySettings ? 14 : Math.max(12, 160 + offset)}px`;
+  template.style.top = `${roomySettings ? 14 : Math.max(12, 96 + offset)}px`;
   $(".app-symbol", template).textContent = app.symbol;
   $(".app-name", template).textContent = appDisplayName(app);
   $(".window-body", template).append(app.render());
@@ -1611,7 +1612,7 @@ function renderNotes() {
 }
 
 function renderSettings() {
-  // Windows-style settings: Home -> category -> detail page. The active route
+  // Layered control center: Home -> category -> detail page. The active route
   // is kept in state so refreshing the Settings window preserves the layer.
   const root = div("app-layout settings-v2");
   const sidebar = div("settings-nav");

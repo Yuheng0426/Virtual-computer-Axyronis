@@ -39,7 +39,8 @@ The Settings app includes an Identity section so users can rename the system, de
 - Quick Center, available from the `QC` taskbar button or `Ctrl + Q`.
 - One-click Power Workspace layout from the Command Palette.
 - Advanced Settings app with Identity, Appearance, Desktop, Startup, and Developer sections.
-- Windows-inspired layered Settings app with Home, category pages, and detail pages.
+- Axyronis layered Settings control center with Home, category pages, and detail pages.
+- Distinct Axyronis Settings layout that fills the desktop workspace without copying Windows visual structure.
 - Display language switching from Settings, with instant updates across the shell, Start menu, desktop icons, taskbar, and Settings.
 - User-editable system name, desktop brand, user name, device name, and boot subtitle.
 - Wallpaper controls inside Settings, with built-in presets and local image selection in Electron mode.
