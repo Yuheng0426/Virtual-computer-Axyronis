@@ -2,14 +2,17 @@
 
 This project uses Git tags so learners can download different versions over time.
 
-## v1.0.0 - Wallpaper Studio Release
+## v1.0.0 - Settings Wallpaper and Identity Release
 
-- Added Wallpaper Studio.
+- Added wallpaper controls inside Settings.
 - Added built-in wallpaper presets.
 - Added local image wallpaper selection in Electron desktop mode.
 - Added browser-mode session wallpaper preview.
 - Added wallpaper source persistence through local preferences.
-- Added Settings entry point for Wallpaper Studio.
+- Added avatar controls inside Settings.
+- Added editable avatar initials.
+- Added local image avatar selection in Electron desktop mode.
+- Removed the standalone wallpaper desktop app so Settings remains the central system control area.
 - Documented the release/version policy.
 
 ## Future Versions

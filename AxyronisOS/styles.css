@@ -727,7 +727,13 @@ button {
   color: #03120f;
   font-weight: 900;
   background: linear-gradient(145deg, var(--accent), var(--accent-2));
+  background-position: center;
+  background-size: cover;
   border-radius: 12px;
+}
+
+.avatar.has-image {
+  color: transparent;
 }
 
 .user-chip span {
@@ -1019,6 +1025,32 @@ button {
   color: var(--text);
   background: rgba(255, 255, 255, 0.08);
   border-radius: 7px;
+}
+
+.avatar-setting {
+  align-items: flex-start;
+}
+
+.avatar-controls {
+  width: min(360px, 62%);
+  display: grid;
+  grid-template-columns: auto 1fr 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.avatar-preview {
+  width: 56px;
+  height: 56px;
+  grid-row: span 2;
+  font-size: 18px;
+}
+
+.avatar-controls small {
+  grid-column: 2 / -1;
+  min-width: 0;
+  color: var(--muted);
+  overflow-wrap: anywhere;
 }
 
 .settings-row input[type="range"] {

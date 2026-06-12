@@ -68,14 +68,6 @@ const apps = [
     render: renderSettings
   },
   {
-    id: "wallpaper",
-    name: "Wallpaper Studio",
-    symbol: "B",
-    desktop: true,
-    size: [760, 520],
-    render: renderWallpaperStudio
-  },
-  {
     id: "system",
     name: "System Monitor",
     symbol: "M",
@@ -161,6 +153,9 @@ const defaultPreferences = {
   userName: "Axyronis User",
   deviceName: "Axyronis Workstation",
   bootSubtitle: "Personal Computing Environment",
+  avatarInitial: "A",
+  avatarImage: "",
+  avatarSource: "Initial avatar",
   accent: "#33e0c2",
   lightMode: false,
   wallpaperDim: 20,
@@ -178,6 +173,7 @@ const state = {
   z: 30,
   active: null,
   startOpen: false,
+  settingsSection: "identity",
   fileLocation: "Desktop",
   accent: preferences.accent,
   lightMode: preferences.lightMode
@@ -237,6 +233,11 @@ function applyPreferences() {
   $(".desktop-brand span:last-child").textContent = preferences.desktopBrand;
   $(".user-chip strong").textContent = preferences.userName;
   $(".user-chip span").textContent = preferences.deviceName;
+  $$(".avatar").forEach(avatar => {
+    avatar.classList.toggle("has-image", Boolean(preferences.avatarImage));
+    avatar.style.backgroundImage = preferences.avatarImage || "";
+    avatar.textContent = preferences.avatarImage ? "" : preferences.avatarInitial.slice(0, 2).toUpperCase();
+  });
 }
 
 function updatePreference(key, value) {
@@ -253,7 +254,6 @@ function resetPreferences() {
   renderDesktopIcons();
   renderStartMenu();
   refreshOpenSettingsPanels();
-  refreshOpenWallpaperPanels();
   showToast("Preferences reset");
 }
 
@@ -268,14 +268,6 @@ function refreshOpenSettingsPanels() {
   const body = $(".window-body", entry.el);
   body.innerHTML = "";
   body.append(renderSettings());
-}
-
-function refreshOpenWallpaperPanels() {
-  const entry = state.windows.get("wallpaper");
-  if (!entry) return;
-  const body = $(".window-body", entry.el);
-  body.innerHTML = "";
-  body.append(renderWallpaperStudio());
 }
 
 function wireGlobalEvents() {
@@ -466,9 +458,9 @@ function getCommands() {
       run: toggleQuickCenter
     },
     {
-      title: "Open Wallpaper Studio",
+      title: "Open Wallpaper Settings",
       detail: "Change desktop wallpaper and presets",
-      run: () => openApp("wallpaper")
+      run: () => openSettingsSection("wallpaper")
     },
     {
       title: "Refresh Desktop",
@@ -495,6 +487,12 @@ function renderCommandResults() {
     });
     results.append(item);
   });
+}
+
+function openSettingsSection(section = "identity") {
+  state.settingsSection = section;
+  openApp("settings");
+  refreshOpenSettingsPanels();
 }
 
 function openPowerWorkspace() {
@@ -1037,13 +1035,13 @@ function renderWindowsApps() {
   return root;
 }
 
-function renderWallpaperStudio() {
+function renderWallpaperSettings() {
   const root = div("app-layout");
   const header = div("native-launch-hero");
   header.innerHTML = `
     <div class="icon-tile">B</div>
     <div>
-      <h2>Wallpaper Studio</h2>
+      <h2>Wallpaper</h2>
       <p>Change the desktop background with presets or a local image.</p>
     </div>
   `;
@@ -1066,7 +1064,7 @@ function renderWallpaperStudio() {
       preferences.wallpaperSource = preset.name;
       savePreferences();
       applyPreferences();
-      refreshOpenWallpaperPanels();
+      refreshOpenSettingsPanels();
       showToast(`Wallpaper set: ${preset.name}`);
     });
     presetGrid.append(card);
@@ -1089,7 +1087,7 @@ function renderWallpaperStudio() {
       preferences.wallpaperSource = picked.path;
       savePreferences();
       applyPreferences();
-      refreshOpenWallpaperPanels();
+      refreshOpenSettingsPanels();
       showToast("Local wallpaper applied");
       return;
     }
@@ -1104,7 +1102,7 @@ function renderWallpaperStudio() {
     preferences.wallpaperImage = `url("${objectUrl}")`;
     preferences.wallpaperSource = `${file.name} (session preview)`;
     applyPreferences();
-    refreshOpenWallpaperPanels();
+    refreshOpenSettingsPanels();
     showToast("Session wallpaper preview applied");
   });
 
@@ -1115,7 +1113,7 @@ function renderWallpaperStudio() {
     preferences.wallpaperSource = preset.name;
     savePreferences();
     applyPreferences();
-    refreshOpenWallpaperPanels();
+    refreshOpenSettingsPanels();
     showToast("Default wallpaper restored");
   });
 
@@ -1199,11 +1197,12 @@ function renderSettings() {
   const sections = [
     ["identity", "Identity"],
     ["appearance", "Appearance"],
+    ["wallpaper", "Wallpaper"],
     ["desktop", "Desktop"],
     ["startup", "Startup"],
     ["developer", "Developer"]
   ];
-  let active = "identity";
+  let active = state.settingsSection || "identity";
 
   const drawSidebar = () => {
     sidebar.innerHTML = "";
@@ -1213,6 +1212,7 @@ function renderSettings() {
       item.textContent = label;
       item.addEventListener("click", () => {
         active = id;
+        state.settingsSection = id;
         drawSidebar();
         drawPanel();
       });
@@ -1228,14 +1228,15 @@ function renderSettings() {
         textSetting("Desktop Brand", "desktopBrand"),
         textSetting("User Name", "userName"),
         textSetting("Device Name", "deviceName"),
-        textSetting("Boot Subtitle", "bootSubtitle")
+        textSetting("Boot Subtitle", "bootSubtitle"),
+        textSetting("Avatar Initial", "avatarInitial"),
+        avatarSetting()
       ]));
     }
 
     if (active === "appearance") {
       const block = settingsBlock("Appearance", "Tune the visual language without touching CSS.", [
         toggleSetting("Light Mode", "lightMode"),
-        rangeSetting("Wallpaper Dim", "wallpaperDim", 0, 70),
         rangeSetting("Glass Blur", "glassBlur", 12, 48)
       ]);
       const colorRow = div("settings-row");
@@ -1254,9 +1255,16 @@ function renderSettings() {
       panel.append(block);
     }
 
+    if (active === "wallpaper") {
+      panel.append(renderWallpaperSettings());
+      panel.append(settingsBlock("Wallpaper Tuning", "Fine-tune how the wallpaper sits behind the desktop shell.", [
+        rangeSetting("Wallpaper Dim", "wallpaperDim", 0, 70)
+      ]));
+    }
+
     if (active === "desktop") {
       panel.append(settingsBlock("Desktop Behavior", "Small shell controls that are useful for remixers.", [
-        actionSetting("Open Wallpaper Studio", "Open", () => openApp("wallpaper")),
+        actionSetting("Open Wallpaper Settings", "Open", () => openSettingsSection("wallpaper")),
         actionSetting("Open Command Palette", "Launch", openCommandPalette),
         actionSetting("Arrange Power Workspace", "Arrange", openPowerWorkspace),
         actionSetting("Refresh Desktop Icons", "Refresh", refreshDesktop)
@@ -1303,8 +1311,70 @@ function textSetting(label, key) {
   const input = document.createElement("input");
   input.value = preferences[key];
   input.maxLength = 42;
-  input.addEventListener("change", () => updatePreference(key, input.value.trim() || defaultPreferences[key]));
+  input.addEventListener("change", () => {
+    const value = input.value.trim() || defaultPreferences[key];
+    updatePreference(key, key === "avatarInitial" ? value.slice(0, 2).toUpperCase() : value);
+  });
   row.append(labelNode(label), input);
+  return row;
+}
+
+function avatarSetting() {
+  const row = div("settings-row avatar-setting");
+  const controls = div("avatar-controls");
+  const preview = div("avatar avatar-preview");
+  const source = document.createElement("small");
+  source.textContent = preferences.avatarSource;
+  const choose = button("Choose Image", "text-button primary");
+  const clear = button("Use Initial", "text-button");
+  const upload = document.createElement("input");
+  upload.type = "file";
+  upload.accept = "image/*";
+  upload.className = "wallpaper-upload";
+
+  const paintPreview = () => {
+    preview.classList.toggle("has-image", Boolean(preferences.avatarImage));
+    preview.style.backgroundImage = preferences.avatarImage || "";
+    preview.textContent = preferences.avatarImage ? "" : preferences.avatarInitial.slice(0, 2).toUpperCase();
+  };
+
+  choose.addEventListener("click", async () => {
+    if (nativeAPI) {
+      const picked = await nativeAPI.pickWallpaper();
+      if (!picked) return;
+      preferences.avatarImage = `url("${picked.url}")`;
+      preferences.avatarSource = picked.path;
+      savePreferences();
+      applyPreferences();
+      refreshOpenSettingsPanels();
+      showToast("Avatar image applied");
+      return;
+    }
+    upload.click();
+  });
+
+  upload.addEventListener("change", () => {
+    const file = upload.files?.[0];
+    if (!file) return;
+    preferences.avatarImage = `url("${URL.createObjectURL(file)}")`;
+    preferences.avatarSource = `${file.name} (session preview)`;
+    applyPreferences();
+    refreshOpenSettingsPanels();
+    showToast("Session avatar preview applied");
+  });
+
+  clear.addEventListener("click", () => {
+    preferences.avatarImage = "";
+    preferences.avatarSource = "Initial avatar";
+    savePreferences();
+    applyPreferences();
+    refreshOpenSettingsPanels();
+    showToast("Initial avatar restored");
+  });
+
+  paintPreview();
+  controls.append(preview, choose, clear, source, upload);
+  row.append(labelNode("Avatar Image"), controls);
   return row;
 }
 

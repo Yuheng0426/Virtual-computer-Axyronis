@@ -6,6 +6,8 @@ Axyronis OS is an educational virtual desktop environment built with HTML, CSS, 
 
 ![Axyronis advanced settings](AxyronisOS/preview-advanced-settings.png)
 
+![Axyronis wallpaper settings](AxyronisOS/preview-settings-wallpaper-v1.png)
+
 ## Project Statement
 
 This project is shared for learning, research, and secondary creation. You may study how it works, modify the interface, add apps, redesign the desktop, or use it as a starting point for your own virtual computer environment.
@@ -16,7 +18,7 @@ Axyronis can launch real Windows programs when running in Electron mode, so trea
 
 I will keep updating and improving this system over time. The goal is to make Axyronis more useful for learners, remixers, UI designers, and people studying how a virtual desktop environment can be built.
 
-Released versions are published with Git tags so users can download different versions. The current version is `v1.0.0`, the Wallpaper Studio release. Future feature releases will continue as `v1.1.0`, `v1.2.0`, and so on.
+Released versions are published with Git tags so users can download different versions. The current version is `v1.0.0`, the Settings wallpaper and identity release. Future feature releases will continue as `v1.1.0`, `v1.2.0`, and so on.
 
 ## Remix Freedom
 
@@ -37,7 +39,8 @@ The Settings app includes an Identity section so users can rename the system, de
 - One-click Power Workspace layout from the Command Palette.
 - Advanced Settings app with Identity, Appearance, Desktop, Startup, and Developer sections.
 - User-editable system name, desktop brand, user name, device name, and boot subtitle.
-- Wallpaper Studio with built-in presets and local image selection in Electron mode.
+- Wallpaper controls inside Settings, with built-in presets and local image selection in Electron mode.
+- Avatar controls inside Settings, with editable initials and local image selection in Electron mode.
 
 ## Settings Are The Core
 
@@ -49,6 +52,8 @@ Current settings include:
 - Desktop Brand
 - User Name
 - Device Name
+- Avatar Initial
+- Avatar Image
 - Boot Subtitle
 - Accent Color
 - Light Mode
@@ -61,7 +66,7 @@ Current settings include:
 
 Users can download different versions from GitHub tags or releases.
 
-- `v1.0.0`: Wallpaper Studio release.
+- `v1.0.0`: Settings wallpaper and identity release.
 - `v1.1.0`: Reserved for the next feature update.
 - `v1.2.0`: Reserved for later feature updates.
 
@@ -122,6 +127,7 @@ AxyronisOS/
 - Add Command Palette actions in `getCommands()` inside `AxyronisOS/app.js`.
 - Add Quick Center controls in `index.html` and style them in `styles.css`.
 - Add wallpaper presets in `wallpaperPresets` inside `AxyronisOS/app.js`.
+- Extend user identity controls in `defaultPreferences` and `renderSettings()` inside `AxyronisOS/app.js`.
 
 ## Safety Notes
 

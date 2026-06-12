@@ -105,6 +105,8 @@ wallpaperImage    CSS background image value
 wallpaperSource   Human-readable source text
 ```
 
+Wallpaper controls are rendered inside Settings rather than as a standalone desktop app. This keeps the system control model simple: users customize identity, avatar, appearance, wallpaper, desktop behavior, and startup behavior from one place.
+
 Electron mode can select a local image through:
 
 ```text
@@ -118,7 +120,7 @@ Browser mode can preview a selected image for the current session with a blob UR
 The repository uses Git tags for downloadable versions.
 
 ```text
-v1.0.0   Wallpaper Studio release
+v1.0.0   Settings wallpaper and identity release
 v1.1.0   Next feature update
 v1.2.0   Later feature update
 ```
