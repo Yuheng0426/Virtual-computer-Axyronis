@@ -39,6 +39,8 @@ The Settings app includes an Identity section so users can rename the system, de
 - Quick Center, available from the `QC` taskbar button or `Ctrl + Q`.
 - One-click Power Workspace layout from the Command Palette.
 - Advanced Settings app with Identity, Appearance, Desktop, Startup, and Developer sections.
+- Windows-inspired layered Settings app with Home, category pages, and detail pages.
+- Display language switching from Settings, with instant updates across the shell, Start menu, desktop icons, taskbar, and Settings.
 - User-editable system name, desktop brand, user name, device name, and boot subtitle.
 - Wallpaper controls inside Settings, with built-in presets and local image selection in Electron mode.
 - Avatar controls inside Settings, with editable initials and local image selection in Electron mode.
@@ -49,12 +51,15 @@ The Settings app is designed as the most important part of the system. It lets l
 
 Current settings include:
 
+- Home dashboard
+- Layered category navigation
 - System Name
 - Desktop Brand
 - User Name
 - Device Name
 - Avatar Initial
 - Avatar Image
+- Display Language
 - Boot Subtitle
 - Accent Color
 - Light Mode

@@ -93,6 +93,14 @@ applyPreferences()     Applies settings to the live desktop
 renderSettings()       Builds the Settings app UI
 ```
 
+Settings uses a layered route stored in `state.settingsCategory` and `state.settingsPage`:
+
+```text
+home -> category -> detail page
+```
+
+Display language strings live in the `locales` object inside `app.js`. Add a new locale by copying the English strings, changing `name`, and translating the `strings` values. The `t("key")` helper falls back to English when a translation is missing.
+
 For a major remix, start by changing `defaultPreferences`, the `apps` array, and the design tokens in `styles.css`.
 
 ## Wallpaper System

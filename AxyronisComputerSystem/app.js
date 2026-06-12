@@ -63,7 +63,7 @@ const apps = [
     name: "Settings",
     symbol: "S",
     desktop: true,
-    size: [860, 560],
+    size: [1040, 680],
     render: renderSettings
   },
   {
@@ -162,7 +162,8 @@ const defaultPreferences = {
   wallpaperImage: wallpaperPresets[0].image,
   wallpaperSource: "Built-in preset",
   glassBlur: 30,
-  startupMode: "clean"
+  startupMode: "clean",
+  language: "en-US"
 };
 
 const preferences = loadPreferences();
@@ -173,14 +174,321 @@ const state = {
   active: null,
   startOpen: false,
   settingsSection: "identity",
+  settingsCategory: "home",
+  settingsPage: "home",
   fileLocation: "Desktop",
   accent: preferences.accent,
   lightMode: preferences.lightMode
 };
 
+// Localized shell strings. Add a new language by copying the English object and
+// replacing the values. User-created names such as systemName stay editable in
+// Settings, while these strings cover the desktop shell and Settings app.
+const locales = {
+  "en-US": {
+    name: "English (United States)",
+    direction: "ltr",
+    strings: {
+      "app.files.name": "Axyronis Files",
+      "app.browser.name": "Nebula Browser",
+      "app.chrome.name": "Google Chrome",
+      "app.windowsApps.name": "Windows Apps",
+      "app.terminal.name": "Axyron Terminal",
+      "app.notes.name": "Stardust Notes",
+      "app.settings.name": "Settings",
+      "app.system.name": "System Monitor",
+      "app.calculator.name": "Calculator",
+      "app.about.name": "About Axyronis",
+      "shell.searchApps": "Search apps, files, and settings",
+      "shell.pinnedApps": "Pinned Apps",
+      "shell.recommended": "Recommended",
+      "shell.commandPalette": "Command Palette",
+      "shell.settings": "Settings",
+      "shell.restartDemo": "Restart Demo",
+      "shell.quickCenter": "Quick Center",
+      "shell.quantumLink": "Quantum Link",
+      "shell.focusMode": "Focus Mode",
+      "shell.nightShift": "Night Shift",
+      "shell.silentMode": "Silent Mode",
+      "shell.brightness": "Brightness",
+      "shell.interfaceScale": "Interface Scale",
+      "shell.personalize": "Personalize",
+      "shell.openTerminal": "Open in Terminal",
+      "shell.newNote": "New Note",
+      "shell.about": "About Axyronis",
+      "shell.typeCommand": "Type a command or app name",
+      "rec.continue": "Continue Editing",
+      "rec.continueDetail": "System ideas in Stardust Notes",
+      "rec.power": "Power Shortcut",
+      "rec.powerDetail": "Open System Monitor",
+      "rec.personalize": "Personalize",
+      "rec.personalizeDetail": "Change the Axyronis accent color",
+      "settings.home": "Home",
+      "settings.search": "Find a setting",
+      "settings.profileStatus": "Local Axyronis account",
+      "settings.deviceCard": "Device",
+      "settings.rename": "Rename",
+      "settings.connected": "Connected",
+      "settings.secure": "Secure",
+      "settings.upToDate": "Up to date",
+      "settings.lastChecked": "Last checked just now",
+      "settings.recommended": "Recommended settings",
+      "settings.recommendedDesc": "Recently used and common controls",
+      "settings.camera": "Camera",
+      "settings.microphone": "Microphone",
+      "settings.printers": "Printers & scanners",
+      "settings.storage": "Cloud storage",
+      "settings.storageDesc": "Simulated learning storage for files, notes, and backups.",
+      "settings.backup": "Computer backup",
+      "settings.manageStorage": "Manage storage",
+      "settings.system": "System",
+      "settings.devices": "Bluetooth & devices",
+      "settings.network": "Network & Internet",
+      "settings.personalization": "Personalization",
+      "settings.apps": "Apps",
+      "settings.accounts": "Accounts",
+      "settings.timeLanguage": "Time & language",
+      "settings.gaming": "Gaming",
+      "settings.accessibility": "Accessibility",
+      "settings.privacy": "Privacy & security",
+      "settings.update": "Windows Update",
+      "settings.developer": "Developer",
+      "settings.display": "Display",
+      "settings.sound": "Sound",
+      "settings.power": "Power",
+      "settings.wallpaper": "Wallpaper",
+      "settings.colors": "Colors",
+      "settings.identity": "Identity",
+      "settings.startup": "Startup",
+      "settings.language": "Language",
+      "settings.region": "Region",
+      "settings.keyboard": "Keyboard",
+      "settings.devFreedom": "Developer freedom",
+      "settings.open": "Open",
+      "settings.launch": "Launch",
+      "settings.arrange": "Arrange",
+      "settings.refresh": "Refresh",
+      "settings.reset": "Reset",
+      "settings.chooseImage": "Choose Image",
+      "settings.useInitial": "Use Initial",
+      "settings.systemIdentity": "System identity",
+      "settings.identityDesc": "Rename the system for your own remix or research build.",
+      "settings.appearanceDesc": "Tune the visual language without touching CSS.",
+      "settings.wallpaperTuning": "Wallpaper tuning",
+      "settings.wallpaperDesc": "Fine-tune how the wallpaper sits behind the desktop shell.",
+      "settings.desktopBehavior": "Desktop behavior",
+      "settings.desktopDesc": "Small shell controls that are useful for remixers.",
+      "settings.startupDesc": "Choose what Axyronis opens after the boot animation.",
+      "settings.languageDesc": "Switch the desktop and Settings language at any time.",
+      "settings.developerDesc": "This project is intentionally open for major rewrites.",
+      "settings.systemName": "System Name",
+      "settings.desktopBrand": "Desktop Brand",
+      "settings.userName": "User Name",
+      "settings.deviceName": "Device Name",
+      "settings.bootSubtitle": "Boot Subtitle",
+      "settings.avatarInitial": "Avatar Initial",
+      "settings.avatarImage": "Avatar Image",
+      "settings.lightMode": "Light Mode",
+      "settings.glassBlur": "Glass Blur",
+      "settings.accentColor": "Accent Color",
+      "settings.wallpaperDim": "Wallpaper Dim",
+      "settings.startupMode": "Startup Mode",
+      "settings.cleanDesktop": "Clean Desktop",
+      "settings.welcomeWindow": "Welcome Window",
+      "settings.powerWorkspace": "Power Workspace",
+      "settings.displayLanguage": "Display Language",
+      "settings.languageNote": "Language changes apply instantly to the shell, Settings, Start menu, desktop icons, and taskbar.",
+      "settings.freedomNote": "You may rename the system, replace the brand, reorganize files, rewrite the UI, add native APIs, or turn Axyronis into a completely different educational computer system. Keep safety notes visible when exposing native power.",
+      "toast.preferencesReset": "Preferences reset",
+      "toast.languageApplied": "Language applied"
+    }
+  },
+  "zh-CN": {
+    name: "简体中文",
+    direction: "ltr",
+    strings: {
+      "app.files.name": "Axyronis 文件",
+      "app.browser.name": "星云浏览器",
+      "app.chrome.name": "Google Chrome",
+      "app.windowsApps.name": "Windows 应用",
+      "app.terminal.name": "Axyron 终端",
+      "app.notes.name": "星尘笔记",
+      "app.settings.name": "设置",
+      "app.system.name": "系统监视器",
+      "app.calculator.name": "计算器",
+      "app.about.name": "关于 Axyronis",
+      "shell.searchApps": "搜索应用、文件和设置",
+      "shell.pinnedApps": "固定的应用",
+      "shell.recommended": "推荐",
+      "shell.commandPalette": "命令面板",
+      "shell.settings": "设置",
+      "shell.restartDemo": "重启演示",
+      "shell.quickCenter": "快速中心",
+      "shell.quantumLink": "量子连接",
+      "shell.focusMode": "专注模式",
+      "shell.nightShift": "夜间模式",
+      "shell.silentMode": "静音模式",
+      "shell.brightness": "亮度",
+      "shell.interfaceScale": "界面缩放",
+      "shell.personalize": "个性化",
+      "shell.openTerminal": "在终端中打开",
+      "shell.newNote": "新建笔记",
+      "shell.about": "关于 Axyronis",
+      "shell.typeCommand": "输入命令或应用名称",
+      "rec.continue": "继续编辑",
+      "rec.continueDetail": "星尘笔记中的系统想法",
+      "rec.power": "高效快捷方式",
+      "rec.powerDetail": "打开系统监视器",
+      "rec.personalize": "个性化",
+      "rec.personalizeDetail": "更改 Axyronis 强调色",
+      "settings.home": "主页",
+      "settings.search": "查找设置",
+      "settings.profileStatus": "本地 Axyronis 帐户",
+      "settings.deviceCard": "设备",
+      "settings.rename": "重命名",
+      "settings.connected": "已连接",
+      "settings.secure": "安全",
+      "settings.upToDate": "已是最新",
+      "settings.lastChecked": "刚刚检查",
+      "settings.recommended": "推荐设置",
+      "settings.recommendedDesc": "最近使用和常用设置",
+      "settings.camera": "摄像头",
+      "settings.microphone": "麦克风",
+      "settings.printers": "打印机和扫描仪",
+      "settings.storage": "云存储空间",
+      "settings.storageDesc": "用于文件、笔记和备份的模拟学习存储。",
+      "settings.backup": "电脑备份",
+      "settings.manageStorage": "管理存储",
+      "settings.system": "系统",
+      "settings.devices": "蓝牙和其他设备",
+      "settings.network": "网络和 Internet",
+      "settings.personalization": "个性化",
+      "settings.apps": "应用",
+      "settings.accounts": "帐户",
+      "settings.timeLanguage": "时间和语言",
+      "settings.gaming": "游戏",
+      "settings.accessibility": "辅助功能",
+      "settings.privacy": "隐私和安全性",
+      "settings.update": "Windows 更新",
+      "settings.developer": "开发者",
+      "settings.display": "显示",
+      "settings.sound": "声音",
+      "settings.power": "电源",
+      "settings.wallpaper": "壁纸",
+      "settings.colors": "颜色",
+      "settings.identity": "身份",
+      "settings.startup": "启动",
+      "settings.language": "语言",
+      "settings.region": "区域",
+      "settings.keyboard": "键盘",
+      "settings.devFreedom": "开发者自由",
+      "settings.open": "打开",
+      "settings.launch": "启动",
+      "settings.arrange": "排列",
+      "settings.refresh": "刷新",
+      "settings.reset": "重置",
+      "settings.chooseImage": "选择图片",
+      "settings.useInitial": "使用首字母",
+      "settings.systemIdentity": "系统身份",
+      "settings.identityDesc": "为你的二次创作或研究版本重命名系统。",
+      "settings.appearanceDesc": "无需修改 CSS 即可调整视觉语言。",
+      "settings.wallpaperTuning": "壁纸调节",
+      "settings.wallpaperDesc": "微调桌面外壳背后的壁纸效果。",
+      "settings.desktopBehavior": "桌面行为",
+      "settings.desktopDesc": "适合二次创作者使用的小型外壳控制。",
+      "settings.startupDesc": "选择开机动画后 Axyronis 打开的内容。",
+      "settings.languageDesc": "随时切换桌面和设置语言。",
+      "settings.developerDesc": "这个项目允许进行大幅重写。",
+      "settings.systemName": "系统名称",
+      "settings.desktopBrand": "桌面品牌",
+      "settings.userName": "用户名",
+      "settings.deviceName": "设备名称",
+      "settings.bootSubtitle": "启动副标题",
+      "settings.avatarInitial": "头像首字母",
+      "settings.avatarImage": "头像图片",
+      "settings.lightMode": "浅色模式",
+      "settings.glassBlur": "玻璃模糊",
+      "settings.accentColor": "强调色",
+      "settings.wallpaperDim": "壁纸暗度",
+      "settings.startupMode": "启动模式",
+      "settings.cleanDesktop": "干净桌面",
+      "settings.welcomeWindow": "欢迎窗口",
+      "settings.powerWorkspace": "高效工作区",
+      "settings.displayLanguage": "显示语言",
+      "settings.languageNote": "语言会立即应用到桌面外壳、设置、开始菜单、桌面图标和任务栏。",
+      "settings.freedomNote": "你可以重命名系统、替换品牌、重组文件、重写界面、添加原生 API，或把 Axyronis 改造成完全不同的教育电脑系统。开放原生能力时请保留安全说明。",
+      "toast.preferencesReset": "偏好设置已重置",
+      "toast.languageApplied": "语言已应用"
+    }
+  },
+  "ja-JP": {
+    name: "日本語",
+    direction: "ltr",
+    strings: {
+      "settings.home": "ホーム",
+      "settings.search": "設定を検索",
+      "settings.language": "言語",
+      "settings.timeLanguage": "時刻と言語",
+      "settings.displayLanguage": "表示言語",
+      "settings.languageDesc": "デスクトップと設定の言語をいつでも切り替えます。",
+      "settings.languageNote": "言語はシェル、設定、スタート メニュー、デスクトップ アイコン、タスクバーにすぐ適用されます。",
+      "shell.settings": "設定",
+      "shell.searchApps": "アプリ、ファイル、設定を検索",
+      "shell.pinnedApps": "ピン留め済みアプリ",
+      "shell.recommended": "おすすめ",
+      "shell.quickCenter": "クイック センター",
+      "shell.commandPalette": "コマンド パレット",
+      "app.settings.name": "設定"
+    }
+  },
+  "es-ES": {
+    name: "Español",
+    direction: "ltr",
+    strings: {
+      "settings.home": "Inicio",
+      "settings.search": "Buscar una configuracion",
+      "settings.language": "Idioma",
+      "settings.timeLanguage": "Hora e idioma",
+      "settings.displayLanguage": "Idioma de pantalla",
+      "settings.languageDesc": "Cambia el idioma del escritorio y Configuracion en cualquier momento.",
+      "settings.languageNote": "El idioma se aplica al shell, Configuracion, Inicio, iconos del escritorio y barra de tareas.",
+      "shell.settings": "Configuracion",
+      "shell.searchApps": "Buscar aplicaciones, archivos y configuracion",
+      "shell.pinnedApps": "Aplicaciones ancladas",
+      "shell.recommended": "Recomendado",
+      "shell.quickCenter": "Centro rapido",
+      "shell.commandPalette": "Paleta de comandos",
+      "app.settings.name": "Configuracion"
+    }
+  },
+  "fr-FR": {
+    name: "Francais",
+    direction: "ltr",
+    strings: {
+      "settings.home": "Accueil",
+      "settings.search": "Rechercher un parametre",
+      "settings.language": "Langue",
+      "settings.timeLanguage": "Heure et langue",
+      "settings.displayLanguage": "Langue d'affichage",
+      "settings.languageDesc": "Changez la langue du bureau et des Parametres a tout moment.",
+      "settings.languageNote": "La langue s'applique au shell, aux Parametres, au menu Demarrer, aux icones et a la barre des taches.",
+      "shell.settings": "Parametres",
+      "shell.searchApps": "Rechercher des applications, fichiers et parametres",
+      "shell.pinnedApps": "Applications epinglees",
+      "shell.recommended": "Recommande",
+      "shell.quickCenter": "Centre rapide",
+      "shell.commandPalette": "Palette de commandes",
+      "app.settings.name": "Parametres"
+    }
+  }
+};
+
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 const appById = id => apps.find(app => app.id === id);
+const locale = () => locales[preferences.language] || locales["en-US"];
+const t = key => locale().strings[key] || locales["en-US"].strings[key] || key;
+const appDisplayName = app => t(`app.${app.id}.name`) || app.name;
 // Present only in Electron mode. In plain browser mode this remains null and
 // native features fall back to safe virtual behavior.
 const nativeAPI = window.axyronisNative || null;
@@ -222,6 +530,8 @@ function applyPreferences() {
   state.accent = preferences.accent;
   state.lightMode = preferences.lightMode;
   document.title = preferences.systemName;
+  document.documentElement.lang = preferences.language;
+  document.documentElement.dir = locale().direction;
   document.documentElement.style.setProperty("--accent", preferences.accent);
   document.documentElement.style.setProperty("--wallpaper-image", preferences.wallpaperImage);
   document.documentElement.style.setProperty("--wallpaper-dim", String(preferences.wallpaperDim / 100));
@@ -237,6 +547,12 @@ function applyPreferences() {
     avatar.style.backgroundImage = preferences.avatarImage || "";
     avatar.textContent = preferences.avatarImage ? "" : preferences.avatarInitial.slice(0, 2).toUpperCase();
   });
+  localizeShell();
+  renderDesktopIcons();
+  renderStartMenu();
+  renderTaskbar();
+  updateOpenWindowTitles();
+  updateClock();
 }
 
 function updatePreference(key, value) {
@@ -253,7 +569,7 @@ function resetPreferences() {
   renderDesktopIcons();
   renderStartMenu();
   refreshOpenSettingsPanels();
-  showToast("Preferences reset");
+  showToast(t("toast.preferencesReset"));
 }
 
 function runStartupMode() {
@@ -341,11 +657,70 @@ function wireGlobalEvents() {
 
 function updateClock() {
   const now = new Date();
-  const time = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
-  const date = now.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit" });
+  const time = now.toLocaleTimeString(preferences.language, { hour: "2-digit", minute: "2-digit" });
+  const date = now.toLocaleDateString(preferences.language, { month: "2-digit", day: "2-digit" });
   $("#trayTime").textContent = time;
   $("#trayDate").textContent = date;
   $("#desktopClock").textContent = time;
+}
+
+function localizeShell() {
+  // Static HTML stays in index.html for readability; this function applies the
+  // active language after preferences load and whenever the language changes.
+  const appSearch = $("#appSearch");
+  const commandSearch = $("#commandSearch");
+  if (appSearch) appSearch.placeholder = t("shell.searchApps");
+  if (commandSearch) commandSearch.placeholder = t("shell.typeCommand");
+
+  const headings = $$(".start-section .section-heading");
+  if (headings[0]) headings[0].textContent = t("shell.pinnedApps");
+  if (headings[1]) headings[1].textContent = t("shell.recommended");
+
+  const menuLabels = {
+    "settings": t("shell.personalize"),
+    "terminal": t("shell.openTerminal"),
+    "notes": t("shell.newNote"),
+    "about": t("shell.about")
+  };
+  $$("[data-open-app]").forEach(item => {
+    const label = menuLabels[item.dataset.openApp] || t(`app.${item.dataset.openApp}.name`);
+    if (label && !item.classList.contains("desktop-icon") && !item.classList.contains("tray-button") && !item.classList.contains("app-card")) {
+      item.textContent = label;
+    }
+  });
+
+  $$("[data-action='open-command-palette']").forEach(item => {
+    item.textContent = item.classList.contains("tray-button") ? "CMD" : t("shell.commandPalette");
+    item.title = t("shell.commandPalette");
+  });
+  const settingsTray = $("[data-open-app='settings'].tray-button");
+  if (settingsTray) settingsTray.title = t("shell.settings");
+  const quickTray = $("[data-action='toggle-quick-center'].tray-button");
+  if (quickTray) quickTray.title = t("shell.quickCenter");
+
+  const startActions = $$(".start-actions button");
+  if (startActions[1]) startActions[1].textContent = t("shell.settings");
+  if (startActions[2]) startActions[2].textContent = t("shell.restartDemo");
+
+  const quickTitle = $(".quick-center-top strong");
+  if (quickTitle) quickTitle.textContent = t("shell.quickCenter");
+  const quickToggles = $$(".quick-toggle");
+  [t("shell.quantumLink"), t("shell.focusMode"), t("shell.nightShift"), t("shell.silentMode")].forEach((label, index) => {
+    if (quickToggles[index]) quickToggles[index].textContent = label;
+  });
+  const sliders = $$(".slider-row span");
+  if (sliders[0]) sliders[0].textContent = t("shell.brightness");
+  if (sliders[1]) sliders[1].textContent = t("shell.interfaceScale");
+
+  const statusPills = $$(".quick-stats span");
+  if (statusPills[1]) statusPills[1].textContent = t("shell.quantumLink");
+}
+
+function updateOpenWindowTitles() {
+  state.windows.forEach(entry => {
+    const name = $(".app-name", entry.el);
+    if (name) name.textContent = appDisplayName(entry.app);
+  });
 }
 
 function renderDesktopIcons() {
@@ -355,7 +730,7 @@ function renderDesktopIcons() {
     const button = document.createElement("button");
     button.className = "desktop-icon";
     button.dataset.openApp = app.id;
-    button.innerHTML = `<span class="icon-tile">${app.symbol}</span><span>${app.name}</span>`;
+    button.innerHTML = `<span class="icon-tile">${app.symbol}</span><span>${appDisplayName(app)}</span>`;
     button.addEventListener("dblclick", () => openApp(app.id));
     desktop.append(button);
   });
@@ -363,7 +738,7 @@ function renderDesktopIcons() {
 
 function renderStartMenu() {
   const query = ($("#appSearch")?.value || "").trim().toLowerCase();
-  const filtered = apps.filter(app => app.name.toLowerCase().includes(query) || app.id.includes(query));
+  const filtered = apps.filter(app => appDisplayName(app).toLowerCase().includes(query) || app.name.toLowerCase().includes(query) || app.id.includes(query));
   const pinned = $("#pinnedApps");
   pinned.innerHTML = "";
 
@@ -371,14 +746,14 @@ function renderStartMenu() {
     const card = document.createElement("button");
     card.className = "app-card";
     card.dataset.openApp = app.id;
-    card.innerHTML = `<span class="icon-tile">${app.symbol}</span><span>${app.name}</span>`;
+    card.innerHTML = `<span class="icon-tile">${app.symbol}</span><span>${appDisplayName(app)}</span>`;
     pinned.append(card);
   });
 
   $("#recommendations").innerHTML = [
-    ["Continue Editing", "System ideas in Stardust Notes"],
-    ["Power Shortcut", "Open System Monitor"],
-    ["Personalize", "Change the Axyronis accent color"]
+    [t("rec.continue"), t("rec.continueDetail")],
+    [t("rec.power"), t("rec.powerDetail")],
+    [t("rec.personalize"), t("rec.personalizeDetail")]
   ].map(item => `<button class="recommendation"><strong>${item[0]}</strong><span>${item[1]}</span></button>`).join("");
 }
 
@@ -429,7 +804,7 @@ function getCommands() {
   // Command Palette entries are intentionally simple objects. This makes it
   // easy for contributors to add shortcuts without touching the palette UI.
   const appCommands = apps.map(app => ({
-    title: `Open ${app.name}`,
+    title: `${t("settings.open")} ${appDisplayName(app)}`,
     detail: "Axyronis app",
     run: () => openApp(app.id)
   }));
@@ -489,6 +864,18 @@ function renderCommandResults() {
 }
 
 function openSettingsSection(section = "identity") {
+  const routes = {
+    identity: ["accounts", "identity"],
+    appearance: ["personalization", "colors"],
+    wallpaper: ["personalization", "wallpaper"],
+    desktop: ["system", "desktop"],
+    startup: ["apps", "startup"],
+    language: ["time", "language"],
+    developer: ["developer", "developer"]
+  };
+  const [category, page] = routes[section] || ["home", "home"];
+  state.settingsCategory = category;
+  state.settingsPage = page;
   state.settingsSection = section;
   openApp("settings");
   refreshOpenSettingsPanels();
@@ -578,7 +965,7 @@ function openApp(id) {
   // nativeLaunch to an app, this branch can still launch approved native apps.
   if (nativeAPI && app.nativeLaunch) {
     nativeAPI.launchApp(app.nativeLaunch).then(result => {
-      showToast(result.message || (result.ok ? `Launched ${app.name}` : `${app.name} failed to launch`), result.ok ? "ok" : "error");
+      showToast(result.message || (result.ok ? `Launched ${appDisplayName(app)}` : `${appDisplayName(app)} failed to launch`), result.ok ? "ok" : "error");
       if (!result.ok) openWindowApp(app);
     }).catch(error => {
       showToast(error.message || String(error), "error");
@@ -609,7 +996,7 @@ function openWindowApp(app) {
   template.style.left = `${Math.max(12, 160 + offset)}px`;
   template.style.top = `${Math.max(12, 96 + offset)}px`;
   $(".app-symbol", template).textContent = app.symbol;
-  $(".app-name", template).textContent = app.name;
+  $(".app-name", template).textContent = appDisplayName(app);
   $(".window-body", template).append(app.render());
   $("#windowLayer").append(template);
 
@@ -715,7 +1102,7 @@ function renderTaskbar() {
   state.windows.forEach((entry, id) => {
     const button = document.createElement("button");
     button.className = `taskbar-item ${state.active === id && !entry.el.classList.contains("is-hidden") ? "active" : ""}`;
-    button.innerHTML = `<span class="app-symbol">${entry.app.symbol}</span><span>${entry.app.name}</span>`;
+    button.innerHTML = `<span class="app-symbol">${entry.app.symbol}</span><span>${appDisplayName(entry.app)}</span>`;
     button.addEventListener("click", () => {
       if (state.active === id && !entry.el.classList.contains("is-hidden")) {
         minimizeWindow(id);
@@ -1224,59 +1611,188 @@ function renderNotes() {
 }
 
 function renderSettings() {
-  // Settings are intentionally local and simple. This makes them easy to study
-  // and safe to change during UI experiments.
-  const root = div("app-layout two-column settings-shell");
-  const sidebar = div("sidebar");
-  const panel = div("settings-panel");
+  // Windows-style settings: Home -> category -> detail page. The active route
+  // is kept in state so refreshing the Settings window preserves the layer.
+  const root = div("app-layout settings-v2");
+  const sidebar = div("settings-nav");
+  const panel = div("settings-content");
   const accents = ["#33e0c2", "#ff5fa2", "#ffc857", "#7c8cff", "#65f283"];
-  const sections = [
-    ["identity", "Identity"],
-    ["appearance", "Appearance"],
-    ["wallpaper", "Wallpaper"],
-    ["desktop", "Desktop"],
-    ["startup", "Startup"],
-    ["developer", "Developer"]
+  const categories = [
+    { id: "home", icon: "H", label: t("settings.home"), desc: t("settings.recommendedDesc"), pages: [] },
+    { id: "system", icon: "S", label: t("settings.system"), desc: "Display, sound, power, and desktop behavior.", pages: ["display", "sound", "power", "desktop"] },
+    { id: "devices", icon: "B", label: t("settings.devices"), desc: "Bluetooth, cameras, printers, and connected devices.", pages: ["bluetooth", "camera", "printers"] },
+    { id: "network", icon: "N", label: t("settings.network"), desc: "Connection status, Wi-Fi, and online services.", pages: ["wifi", "internet"] },
+    { id: "personalization", icon: "P", label: t("settings.personalization"), desc: "Wallpaper, colors, glass, and desktop style.", pages: ["wallpaper", "colors"] },
+    { id: "apps", icon: "A", label: t("settings.apps"), desc: "Startup behavior and app actions.", pages: ["startup", "defaultApps"] },
+    { id: "accounts", icon: "U", label: t("settings.accounts"), desc: "User identity, device name, and avatar.", pages: ["identity"] },
+    { id: "time", icon: "T", label: t("settings.timeLanguage"), desc: "Language, region, time, and keyboard.", pages: ["language", "region", "keyboard"] },
+    { id: "gaming", icon: "G", label: t("settings.gaming"), desc: "Game mode and performance shortcuts.", pages: ["gameMode"] },
+    { id: "accessibility", icon: "E", label: t("settings.accessibility"), desc: "Readable interface and focus controls.", pages: ["contrast", "motion"] },
+    { id: "privacy", icon: "V", label: t("settings.privacy"), desc: "Permissions, safety notes, and local data.", pages: ["privacy"] },
+    { id: "update", icon: "W", label: t("settings.update"), desc: "Version status and learning release notes.", pages: ["updates"] },
+    { id: "developer", icon: "D", label: t("settings.developer"), desc: t("settings.developerDesc"), pages: ["developer"] }
   ];
-  let active = state.settingsSection || "identity";
+  const pageMeta = {
+    display: [t("settings.display"), "Scale, brightness, and display comfort."],
+    sound: [t("settings.sound"), "Volume, microphone, and audio routing."],
+    power: [t("settings.power"), "Startup mode, workspace restore, and performance profile."],
+    desktop: [t("settings.desktopBehavior"), t("settings.desktopDesc")],
+    bluetooth: [t("settings.devices"), "Pair and manage simulated devices."],
+    camera: [t("settings.camera"), "Camera permissions and launch shortcuts."],
+    printers: [t("settings.printers"), "Printer and scanner style settings."],
+    wifi: [t("settings.network"), "Connection status and network controls."],
+    internet: ["Internet", "Browser and web access settings."],
+    wallpaper: [t("settings.wallpaper"), t("settings.wallpaperDesc")],
+    colors: [t("settings.colors"), t("settings.appearanceDesc")],
+    startup: [t("settings.startup"), t("settings.startupDesc")],
+    defaultApps: ["Default apps", "Choose which virtual app opens common actions."],
+    identity: [t("settings.identity"), t("settings.identityDesc")],
+    language: [t("settings.language"), t("settings.languageDesc")],
+    region: [t("settings.region"), "Regional formats for date and time."],
+    keyboard: [t("settings.keyboard"), "Keyboard layout and shortcut preferences."],
+    gameMode: [t("settings.gaming"), "Game mode and performance layout."],
+    contrast: [t("settings.accessibility"), "Readable colors and visual comfort."],
+    motion: ["Visual effects", "Motion and animation preferences."],
+    privacy: [t("settings.privacy"), "Local privacy and native access notes."],
+    updates: [t("settings.update"), "Current version and update channel."],
+    developer: [t("settings.devFreedom"), t("settings.developerDesc")]
+  };
+  let activeCategory = state.settingsCategory || "home";
+  let activePage = state.settingsPage || "home";
+
+  const route = (category, page = "category") => {
+    activeCategory = category;
+    activePage = category === "home" ? "home" : page;
+    state.settingsCategory = activeCategory;
+    state.settingsPage = activePage;
+    state.settingsSection = activePage === "category" ? activeCategory : activePage;
+    drawSidebar();
+    drawPanel();
+  };
 
   const drawSidebar = () => {
     sidebar.innerHTML = "";
-    sections.forEach(([id, label]) => {
+    const profile = div("settings-profile");
+    profile.innerHTML = `
+      <div class="avatar">${preferences.avatarImage ? "" : preferences.avatarInitial.slice(0, 2).toUpperCase()}</div>
+      <div>
+        <strong>${escapeHtml(preferences.userName)}</strong>
+        <span>${escapeHtml(t("settings.profileStatus"))}</span>
+      </div>
+    `;
+    const avatar = $(".avatar", profile);
+    avatar.classList.toggle("has-image", Boolean(preferences.avatarImage));
+    avatar.style.backgroundImage = preferences.avatarImage || "";
+
+    const search = document.createElement("input");
+    search.className = "settings-search";
+    search.type = "search";
+    search.placeholder = t("settings.search");
+    sidebar.append(profile, search);
+
+    categories.forEach(category => {
       const item = document.createElement("button");
-      item.className = id === active ? "active" : "";
-      item.textContent = label;
-      item.addEventListener("click", () => {
-        active = id;
-        state.settingsSection = id;
-        drawSidebar();
-        drawPanel();
-      });
+      item.className = category.id === activeCategory ? "active" : "";
+      item.innerHTML = `<span>${category.icon}</span><strong>${category.label}</strong>`;
+      item.addEventListener("click", () => route(category.id));
       sidebar.append(item);
     });
   };
 
   const drawPanel = () => {
     panel.innerHTML = "";
-    if (active === "identity") {
-      panel.append(settingsBlock("System Identity", "Rename the system for your own remix or research build.", [
-        textSetting("System Name", "systemName"),
-        textSetting("Desktop Brand", "desktopBrand"),
-        textSetting("User Name", "userName"),
-        textSetting("Device Name", "deviceName"),
-        textSetting("Boot Subtitle", "bootSubtitle"),
-        textSetting("Avatar Initial", "avatarInitial"),
+    if (activePage === "home") {
+      drawHome();
+      return;
+    }
+    if (activePage === "category") {
+      drawCategory(activeCategory);
+      return;
+    }
+    drawDetail(activePage);
+  };
+
+  const drawHome = () => {
+    const hero = div("settings-home-hero");
+    hero.innerHTML = `
+      <div class="settings-device-preview"></div>
+      <div>
+        <h2>${escapeHtml(preferences.userName)}</h2>
+        <p>${escapeHtml(preferences.deviceName)}</p>
+        <button class="text-button primary" type="button">${t("settings.rename")}</button>
+      </div>
+      <div class="settings-status-strip">
+        <span><strong>${t("shell.quantumLink")}</strong><small>${t("settings.connected")}, ${t("settings.secure")}</small></span>
+        <span><strong>${t("settings.update")}</strong><small>${t("settings.lastChecked")}</small></span>
+      </div>
+    `;
+    $("button", hero).addEventListener("click", () => route("accounts", "identity"));
+
+    const recommended = div("setting-block settings-stack");
+    recommended.innerHTML = `<h3>${t("settings.recommended")}</h3><p>${t("settings.recommendedDesc")}</p>`;
+    [
+      [t("settings.camera"), "camera", "devices"],
+      [t("settings.microphone"), "sound", "system"],
+      [t("settings.printers"), "printers", "devices"]
+    ].forEach(([label, page, category]) => recommended.append(settingLink(label, pageMeta[page][1], () => route(category, page))));
+
+    const storage = div("setting-block settings-stack");
+    storage.innerHTML = `
+      <h3>${t("settings.storage")}</h3>
+      <p>${t("settings.storageDesc")}</p>
+      <div class="storage-meter"><span style="width: 18%"></span></div>
+    `;
+    storage.append(settingLink(t("settings.backup"), "Axyronis local profile ready", () => route("privacy", "privacy")));
+    storage.append(settingLink(t("settings.manageStorage"), "9.9 GB used of 1.0 TB", () => route("system", "power")));
+
+    const homeGrid = div("settings-home-grid");
+    homeGrid.append(recommended, storage);
+
+    const categoryGrid = div("settings-category-grid");
+    categories.filter(category => category.id !== "home").forEach(category => {
+      const card = document.createElement("button");
+      card.className = "settings-category-card";
+      card.innerHTML = `<span>${category.icon}</span><strong>${category.label}</strong><small>${category.desc}</small>`;
+      card.addEventListener("click", () => route(category.id));
+      categoryGrid.append(card);
+    });
+
+    panel.append(settingsHeader(t("settings.home"), t("settings.recommendedDesc")), hero, homeGrid, categoryGrid);
+  };
+
+  const drawCategory = categoryId => {
+    const category = categories.find(item => item.id === categoryId) || categories[0];
+    const list = div("settings-detail-list");
+    category.pages.forEach(page => {
+      const meta = pageMeta[page] || [page, ""];
+      list.append(settingLink(meta[0], meta[1], () => route(categoryId, page)));
+    });
+    panel.append(settingsHeader(category.label, category.desc, () => route("home")), list);
+  };
+
+  const drawDetail = page => {
+    const meta = pageMeta[page] || [page, ""];
+    panel.append(settingsHeader(meta[0], meta[1], () => route(activeCategory)));
+
+    if (page === "identity") {
+      panel.append(settingsBlock(t("settings.systemIdentity"), t("settings.identityDesc"), [
+        textSetting(t("settings.systemName"), "systemName"),
+        textSetting(t("settings.desktopBrand"), "desktopBrand"),
+        textSetting(t("settings.userName"), "userName"),
+        textSetting(t("settings.deviceName"), "deviceName"),
+        textSetting(t("settings.bootSubtitle"), "bootSubtitle"),
+        textSetting(t("settings.avatarInitial"), "avatarInitial"),
         avatarSetting()
       ]));
     }
 
-    if (active === "appearance") {
-      const block = settingsBlock("Appearance", "Tune the visual language without touching CSS.", [
-        toggleSetting("Light Mode", "lightMode"),
-        rangeSetting("Glass Blur", "glassBlur", 12, 48)
+    if (page === "colors" || page === "display" || page === "contrast") {
+      const block = settingsBlock(t("settings.colors"), t("settings.appearanceDesc"), [
+        toggleSetting(t("settings.lightMode"), "lightMode"),
+        rangeSetting(t("settings.glassBlur"), "glassBlur", 12, 48)
       ]);
       const colorRow = div("settings-row");
-      colorRow.innerHTML = "<span>Accent Color</span>";
+      colorRow.innerHTML = `<span>${t("settings.accentColor")}</span>`;
       const swatches = div("swatches");
       accents.forEach(color => {
         const swatch = document.createElement("button");
@@ -1291,39 +1807,56 @@ function renderSettings() {
       panel.append(block);
     }
 
-    if (active === "wallpaper") {
+    if (page === "wallpaper") {
       panel.append(renderWallpaperSettings());
-      panel.append(settingsBlock("Wallpaper Tuning", "Fine-tune how the wallpaper sits behind the desktop shell.", [
-        rangeSetting("Wallpaper Dim", "wallpaperDim", 0, 70)
+      panel.append(settingsBlock(t("settings.wallpaperTuning"), t("settings.wallpaperDesc"), [
+        rangeSetting(t("settings.wallpaperDim"), "wallpaperDim", 0, 70)
       ]));
     }
 
-    if (active === "desktop") {
-      panel.append(settingsBlock("Desktop Behavior", "Small shell controls that are useful for remixers.", [
-        actionSetting("Open Wallpaper Settings", "Open", () => openSettingsSection("wallpaper")),
-        actionSetting("Open Command Palette", "Launch", openCommandPalette),
-        actionSetting("Arrange Power Workspace", "Arrange", openPowerWorkspace),
-        actionSetting("Refresh Desktop Icons", "Refresh", refreshDesktop)
+    if (page === "desktop" || page === "defaultApps") {
+      panel.append(settingsBlock(t("settings.desktopBehavior"), t("settings.desktopDesc"), [
+        actionSetting(t("settings.wallpaper"), t("settings.open"), () => route("personalization", "wallpaper")),
+        actionSetting(t("shell.commandPalette"), t("settings.launch"), openCommandPalette),
+        actionSetting(t("settings.powerWorkspace"), t("settings.arrange"), openPowerWorkspace),
+        actionSetting("Desktop Icons", t("settings.refresh"), refreshDesktop)
       ]));
     }
 
-    if (active === "startup") {
-      panel.append(settingsBlock("Startup", "Choose what Axyronis opens after the boot animation.", [
-        selectSetting("Startup Mode", "startupMode", [
-          ["clean", "Clean Desktop"],
-          ["welcome", "Welcome Window"],
-          ["workspace", "Power Workspace"]
+    if (page === "startup" || page === "power") {
+      panel.append(settingsBlock(t("settings.startup"), t("settings.startupDesc"), [
+        selectSetting(t("settings.startupMode"), "startupMode", [
+          ["clean", t("settings.cleanDesktop")],
+          ["welcome", t("settings.welcomeWindow")],
+          ["workspace", t("settings.powerWorkspace")]
         ]),
-        actionSetting("Reset Preferences", "Reset", resetPreferences)
+        actionSetting("Preferences", t("settings.reset"), resetPreferences)
       ]));
     }
 
-    if (active === "developer") {
-      const block = settingsBlock("Developer Freedom", "This project is intentionally open for major rewrites.", [
-        actionSetting("Open Architecture Notes", "Open Docs", () => openApp("about"))
+    if (page === "language" || page === "region" || page === "keyboard") {
+      const block = settingsBlock(t("settings.language"), t("settings.languageDesc"), [
+        selectSetting(t("settings.displayLanguage"), "language", Object.entries(locales).map(([value, info]) => [value, info.name]))
       ]);
       const note = div("developer-note");
-      note.textContent = "You may rename the system, replace the brand, reorganize files, rewrite the UI, add native APIs, or turn Axyronis into a completely different educational computer system. Keep safety notes visible when exposing native power.";
+      note.textContent = t("settings.languageNote");
+      block.append(note);
+      panel.append(block);
+    }
+
+    if (["bluetooth", "camera", "printers", "wifi", "internet", "sound", "gameMode", "privacy", "updates", "motion"].includes(page)) {
+      panel.append(settingsBlock(meta[0], meta[1], [
+        actionSetting(t("settings.refresh"), t("settings.refresh"), () => showToast(`${meta[0]} ${t("settings.upToDate")}`)),
+        actionSetting(t("settings.open"), t("settings.open"), () => showToast(`${meta[0]} ${t("settings.connected")}`))
+      ]));
+    }
+
+    if (page === "developer") {
+      const block = settingsBlock(t("settings.devFreedom"), t("settings.developerDesc"), [
+        actionSetting("Architecture Notes", "Open Docs", () => openApp("about"))
+      ]);
+      const note = div("developer-note");
+      note.textContent = t("settings.freedomNote");
       block.append(note);
       panel.append(block);
     }
@@ -1340,6 +1873,34 @@ function settingsBlock(title, description, rows) {
   block.innerHTML = `<h3>${title}</h3><p>${description}</p>`;
   rows.forEach(row => block.append(row));
   return block;
+}
+
+function settingsHeader(title, description, backAction = null) {
+  const header = div("settings-page-header");
+  if (backAction) {
+    const back = button("<", "icon-button");
+    back.title = "Back";
+    back.addEventListener("click", backAction);
+    header.append(back);
+  }
+  const copy = document.createElement("div");
+  copy.innerHTML = `<h2>${escapeHtml(title)}</h2><p>${escapeHtml(description)}</p>`;
+  header.append(copy);
+  return header;
+}
+
+function settingLink(title, description, action) {
+  const item = document.createElement("button");
+  item.className = "settings-link";
+  item.innerHTML = `
+    <span>
+      <strong>${escapeHtml(title)}</strong>
+      <small>${escapeHtml(description)}</small>
+    </span>
+    <b>></b>
+  `;
+  item.addEventListener("click", action);
+  return item;
 }
 
 function textSetting(label, key) {
@@ -1361,8 +1922,8 @@ function avatarSetting() {
   const preview = div("avatar avatar-preview");
   const source = document.createElement("small");
   source.textContent = preferences.avatarSource;
-  const choose = button("Choose Image", "text-button primary");
-  const clear = button("Use Initial", "text-button");
+  const choose = button(t("settings.chooseImage"), "text-button primary");
+  const clear = button(t("settings.useInitial"), "text-button");
   const upload = document.createElement("input");
   upload.type = "file";
   upload.accept = "image/*";
@@ -1410,7 +1971,7 @@ function avatarSetting() {
 
   paintPreview();
   controls.append(preview, choose, clear, source, upload);
-  row.append(labelNode("Avatar Image"), controls);
+  row.append(labelNode(t("settings.avatarImage")), controls);
   return row;
 }
 
@@ -1449,7 +2010,10 @@ function selectSetting(label, key, options) {
     option.selected = preferences[key] === value;
     select.append(option);
   });
-  select.addEventListener("change", () => updatePreference(key, select.value));
+  select.addEventListener("change", () => {
+    updatePreference(key, select.value);
+    if (key === "language") showToast(t("toast.languageApplied"));
+  });
   row.append(labelNode(label), select);
   return row;
 }
