@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Axyronis OS</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="boot" class="boot-screen">
+      <div class="boot-mark" aria-hidden="true">
+        <span>A</span>
+      </div>
+      <div class="boot-title">Axyronis</div>
+      <div class="boot-subtitle">Personal Computing Environment</div>
+      <div class="boot-track">
+        <div class="boot-bar"></div>
+      </div>
+    </div>
+
+    <main id="os" class="os is-hidden" aria-label="Axyronis desktop environment">
+      <section id="desktop" class="desktop" aria-label="Desktop">
+        <div class="desktop-shade"></div>
+        <div class="desktop-status">
+          <div class="desktop-brand">
+            <span class="mini-mark">A</span>
+            <span>Axyronis</span>
+          </div>
+          <div class="quick-stats" aria-label="System status">
+            <span id="desktopClock">--:--</span>
+            <span>Quantum Link</span>
+            <span>92%</span>
+          </div>
+        </div>
+        <div id="desktopIcons" class="desktop-icons"></div>
+        <div id="windowLayer" class="window-layer"></div>
+      </section>
+
+      <div id="desktopMenu" class="desktop-menu" aria-hidden="true">
+        <button data-action="refresh-desktop">Refresh</button>
+        <button data-open-app="settings">Personalize</button>
+        <button data-open-app="terminal">Open in Terminal</button>
+        <button data-open-app="notes">New Note</button>
+        <button data-action="open-command-palette">Command Palette</button>
+        <button data-open-app="about">About Axyronis</button>
+      </div>
+
+      <aside id="startMenu" class="start-menu" aria-label="Start menu" aria-hidden="true">
+        <div class="start-top">
+          <div class="user-chip">
+            <div class="avatar">A</div>
+            <div>
+              <strong>Axyronis User</strong>
+              <span>Local Administrator</span>
+            </div>
+          </div>
+          <button class="icon-button" data-action="toggle-start" title="Close start menu">X</button>
+        </div>
+        <label class="search-box" aria-label="Search apps">
+          <span>/</span>
+          <input id="appSearch" type="search" placeholder="Search apps, files, and settings" autocomplete="off" />
+        </label>
+        <div class="start-section">
+          <div class="section-heading">Pinned Apps</div>
+          <div id="pinnedApps" class="pinned-grid"></div>
+        </div>
+        <div class="start-section">
+          <div class="section-heading">Recommended</div>
+          <div id="recommendations" class="recommendations"></div>
+        </div>
+        <div class="start-actions">
+          <button class="text-button" data-action="open-command-palette">Command Palette</button>
+          <button class="text-button" data-open-app="settings">Settings</button>
+          <button class="text-button danger" data-action="reboot">Restart Demo</button>
+        </div>
+      </aside>
+
+      <aside id="quickCenter" class="quick-center" aria-label="Quick center" aria-hidden="true">
+        <div class="quick-center-top">
+          <strong>Quick Center</strong>
+          <button class="icon-button" data-action="toggle-quick-center" title="Close quick center">X</button>
+        </div>
+        <div class="quick-toggle-grid">
+          <button class="quick-toggle active">Quantum Link</button>
+          <button class="quick-toggle active">Focus Mode</button>
+          <button class="quick-toggle">Night Shift</button>
+          <button class="quick-toggle">Silent Mode</button>
+        </div>
+        <label class="slider-row">
+          <span>Brightness</span>
+          <input type="range" min="10" max="100" value="86" />
+        </label>
+        <label class="slider-row">
+          <span>Interface Scale</span>
+          <input type="range" min="80" max="120" value="100" />
+        </label>
+      </aside>
+
+      <div id="commandPalette" class="command-palette" aria-hidden="true">
+        <div class="command-panel">
+          <label class="search-box" aria-label="Command search">
+            <span>></span>
+            <input id="commandSearch" type="search" placeholder="Type a command or app name" autocomplete="off" />
+          </label>
+          <div id="commandResults" class="command-results"></div>
+        </div>
+      </div>
+
+      <nav class="taskbar" aria-label="Taskbar">
+        <button id="startButton" class="start-button" title="Start">
+          <span class="start-glyph">A</span>
+        </button>
+        <div id="taskbarApps" class="taskbar-apps"></div>
+        <div class="system-tray">
+          <button class="tray-button" data-action="open-command-palette" title="Command Palette">CMD</button>
+          <button class="tray-button" data-open-app="system" title="System Monitor">CPU</button>
+          <button class="tray-button" data-open-app="settings" title="Settings">SET</button>
+          <button class="tray-button" data-action="toggle-quick-center" title="Quick Center">QC</button>
+          <div class="tray-clock">
+            <strong id="trayTime">--:--</strong>
+            <span id="trayDate">--/--</span>
+          </div>
+        </div>
+      </nav>
+    </main>
+
+    <template id="windowTemplate">
+      <section class="app-window" role="dialog" aria-modal="false">
+        <header class="window-titlebar">
+          <div class="window-title">
+            <span class="app-symbol"></span>
+            <span class="app-name"></span>
+          </div>
+          <div class="window-controls">
+            <button class="window-button" data-window-action="minimize" title="Minimize">_</button>
+            <button class="window-button" data-window-action="maximize" title="Maximize">[]</button>
+            <button class="window-button close" data-window-action="close" title="Close">X</button>
+          </div>
+        </header>
+        <div class="window-body"></div>
+      </section>
+    </template>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

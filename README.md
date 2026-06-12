@@ -1,1 +1,88 @@
-# Virtual-computer-Axyronis
+# Axyronis OS
+
+Axyronis OS is an educational virtual desktop environment built with HTML, CSS, JavaScript, and Electron. It is not a real operating system kernel. It is a Windows-hosted desktop shell experiment designed for learning, UI prototyping, and creative remixing.
+
+![Axyronis command palette](AxyronisOS/preview-english-command-palette.png)
+
+## Project Statement
+
+This project is shared for learning, research, and secondary creation. You may study how it works, modify the interface, add apps, redesign the desktop, or use it as a starting point for your own virtual computer environment.
+
+Axyronis can launch real Windows programs when running in Electron mode, so treat the terminal and app launcher with the same care you would use in Windows itself.
+
+## What It Can Do
+
+- Desktop shell with icons, taskbar, start menu, window manager, context menu, and glass-style UI.
+- Electron desktop mode with controlled native access through a preload bridge.
+- Real Windows app launcher for Chrome, Edge, File Explorer, Notepad, Calculator, Task Manager, Command Prompt, PowerShell, and Paint.
+- Nebula Browser with a real Electron `webview`.
+- Local file browser in desktop mode.
+- Axyron Terminal with built-in commands and native command execution.
+- Command Palette, available from the `CMD` taskbar button or `Ctrl + K`.
+- Quick Center, available from the `QC` taskbar button or `Ctrl + Q`.
+- One-click Power Workspace layout from the Command Palette.
+
+## Run It
+
+### Recommended Desktop Mode
+
+Double-click:
+
+```bat
+Start-Axyronis.bat
+```
+
+If dependencies are missing, run:
+
+```bat
+Install-Axyronis-Desktop.bat
+```
+
+### Manual Development Mode
+
+```bash
+cd AxyronisOS
+npm install
+npm start
+```
+
+### Browser Preview Mode
+
+Open:
+
+```text
+AxyronisOS/index.html
+```
+
+Browser preview mode cannot launch local Windows apps. Use Electron mode for native features.
+
+## Project Structure
+
+```text
+AxyronisOS/
+  index.html          Main desktop shell markup
+  styles.css          Visual system, layout, windows, panels, controls
+  app.js              Desktop apps, window manager, command palette, UI logic
+  electron-main.js    Electron main process and native Windows integration
+  preload.js          Safe bridge between UI code and native APIs
+  assets/             Wallpaper and visual assets
+```
+
+## How To Modify It
+
+- Add a new built-in app in `AxyronisOS/app.js` by adding an entry to the `apps` array and writing a `renderYourApp()` function.
+- Add a real Windows launcher in `AxyronisOS/electron-main.js` by extending the `windowsApps` object.
+- Change the desktop theme in `AxyronisOS/styles.css`, especially the `:root` variables.
+- Add Command Palette actions in `getCommands()` inside `AxyronisOS/app.js`.
+- Add Quick Center controls in `index.html` and style them in `styles.css`.
+
+## Safety Notes
+
+- Axyronis is a desktop shell experiment, not a replacement for Windows.
+- Native mode can run real commands and open real programs.
+- Do not run destructive commands unless you understand them.
+- Keep `nodeIntegration` disabled and use `preload.js` for native APIs.
+
+## License
+
+This project is released under the MIT License. See [LICENSE](LICENSE).

@@ -1,0 +1,28 @@
+{
+  "name": "axyronis-os",
+  "version": "1.0.0",
+  "description": "Axyronis personal desktop environment",
+  "main": "electron-main.js",
+  "private": true,
+  "author": "Yuheng0426",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Yuheng0426/Virtual-computer-Axyronis.git"
+  },
+  "keywords": [
+    "electron",
+    "virtual-desktop",
+    "desktop-environment",
+    "learning-project",
+    "windows-shell"
+  ],
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "check": "node --check app.js && node --check electron-main.js && node --check preload.js"
+  },
+  "devDependencies": {
+    "electron": "^42.4.0"
+  }
+}
