@@ -4,6 +4,7 @@ This project uses Git tags so learners can download different versions over time
 
 ## v1.0.0 - Settings Wallpaper and Identity Release
 
+- Changed the Google Chrome desktop icon to open an internal Axyronis browser window instead of leaving the system.
 - Added wallpaper controls inside Settings.
 - Added built-in wallpaper presets.
 - Added local image wallpaper selection in Electron desktop mode.

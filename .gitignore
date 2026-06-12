@@ -15,11 +15,12 @@ Virtual computer/
 
 # Generated preview screenshots are useful locally, but the README points to
 # curated English screenshots only when they are intentionally committed.
-AxyronisOS/preview-*.png
-!AxyronisOS/preview-english-command-palette.png
-!AxyronisOS/preview-english-quick-center.png
-!AxyronisOS/preview-advanced-settings.png
-!AxyronisOS/preview-settings-wallpaper-v1.png
+AxyronisComputerSystem/preview-*.png
+!AxyronisComputerSystem/preview-english-command-palette.png
+!AxyronisComputerSystem/preview-english-quick-center.png
+!AxyronisComputerSystem/preview-advanced-settings.png
+!AxyronisComputerSystem/preview-settings-wallpaper-v1.png
+!AxyronisComputerSystem/preview-internal-chrome-v1.png
 
 # OS metadata
 Thumbs.db

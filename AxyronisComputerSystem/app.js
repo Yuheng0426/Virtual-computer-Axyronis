@@ -7,8 +7,8 @@
 
 // App registry:
 // Add new virtual apps here. Each app points to a render function that returns
-// a DOM node. If nativeLaunch is set, Electron mode launches a real Windows app
-// instead of opening a virtual window.
+// a DOM node. Native Windows programs are launched from the Windows Apps panel,
+// while desktop icons stay inside the Axyronis computer system.
 const apps = [
   {
     id: "files",
@@ -31,9 +31,8 @@ const apps = [
     name: "Google Chrome",
     symbol: "G",
     desktop: true,
-    size: [520, 360],
-    nativeLaunch: "chrome",
-    render: renderChromeLauncher
+    size: [980, 640],
+    render: renderChromeBrowser
   },
   {
     id: "windowsApps",
@@ -438,8 +437,8 @@ function getCommands() {
   return [
     ...appCommands,
     {
-      title: "Launch Google Chrome",
-      detail: "Open the real Windows Chrome app",
+      title: "Open Google Chrome",
+      detail: "Browse Google inside Axyronis",
       run: () => openApp("chrome")
     },
     {
@@ -575,9 +574,8 @@ function openApp(id) {
   const app = appById(id);
   if (!app) return;
 
-  // Some desktop icons represent real Windows applications. In Electron mode
-  // those launch through the native bridge; in browser mode they fall back to a
-  // normal educational window explaining the limitation.
+  // Most desktop icons open virtual windows inside Axyronis. If a remix adds
+  // nativeLaunch to an app, this branch can still launch approved native apps.
   if (nativeAPI && app.nativeLaunch) {
     nativeAPI.launchApp(app.nativeLaunch).then(result => {
       showToast(result.message || (result.ok ? `Launched ${app.name}` : `${app.name} failed to launch`), result.ok ? "ok" : "error");
@@ -933,42 +931,80 @@ function renderNativeBrowser() {
   return root;
 }
 
-function renderChromeLauncher() {
-  const root = div("app-layout");
-  root.innerHTML = `
-    <section class="native-launch-hero">
-      <div class="icon-tile">G</div>
-      <div>
-        <h2>Google Chrome</h2>
-        <p>In the desktop edition, this launches the real Google Chrome installed on Windows.</p>
-      </div>
-    </section>
-  `;
+function renderChromeBrowser() {
+  // This is an internal Chrome-style browser window. It stays inside Axyronis
+  // instead of launching the host Windows Chrome process.
+  if (!nativeAPI) return renderBrowserOnlyChrome();
 
+  const root = div("app-layout native-browser chrome-browser");
+  const bar = div("browser-bar chrome-bar");
+  const back = button("<", "text-button");
+  const forward = button(">", "text-button");
+  const reload = button("Reload", "text-button");
+  const home = button("Home", "text-button");
+  const input = document.createElement("input");
+  const go = button("Go", "text-button primary");
+  const webview = document.createElement("webview");
+  webview.className = "webview";
+  webview.setAttribute("allowpopups", "");
+  input.value = "https://www.google.com/?hl=en";
+  webview.src = input.value;
+
+  const navigate = () => {
+    const url = normalizeUrl(input.value);
+    input.value = url;
+    webview.src = url;
+  };
+
+  go.addEventListener("click", navigate);
+  input.addEventListener("keydown", event => {
+    if (event.key === "Enter") navigate();
+  });
+  back.addEventListener("click", () => webview.canGoBack() && webview.goBack());
+  forward.addEventListener("click", () => webview.canGoForward() && webview.goForward());
+  reload.addEventListener("click", () => webview.reload());
+  home.addEventListener("click", () => {
+    input.value = "https://www.google.com/?hl=en";
+    navigate();
+  });
+  webview.addEventListener("did-navigate", event => {
+    input.value = event.url;
+  });
+  webview.addEventListener("did-navigate-in-page", event => {
+    input.value = event.url;
+  });
+
+  bar.append(back, forward, reload, home, input, go);
+  root.append(bar, webview);
+  return root;
+}
+
+function renderBrowserOnlyChrome() {
+  const root = div("app-layout");
   const bar = div("browser-bar");
   const input = document.createElement("input");
-  input.value = "https://www.google.com";
-  const launch = button("Open with Chrome", "text-button primary");
-  const edge = button("Open with Edge", "text-button");
-  const status = div("file-preview");
-  status.textContent = nativeAPI ? "Ready to launch a real browser." : "Web mode cannot launch local Chrome. Start the desktop edition instead.";
-
-  launch.addEventListener("click", async () => {
-    if (!nativeAPI) return;
-    const result = await nativeAPI.launchApp("chrome", [normalizeUrl(input.value)]);
-    status.textContent = result.message;
-    showToast(result.message, result.ok ? "ok" : "error");
+  input.value = "https://www.google.com/?hl=en";
+  const go = button("Go", "text-button primary");
+  const page = div("browser-page");
+  const draw = () => {
+    page.innerHTML = `
+      <section class="portal-hero">
+        <h2>Google Chrome</h2>
+        <p>Internal browsing requires Electron desktop mode. Browser preview mode shows this simulated page.</p>
+      </section>
+      <div class="portal-grid">
+        <article class="portal-card"><h3>Inside Axyronis</h3><p>In desktop mode, Google opens inside this computer system window.</p></article>
+        <article class="portal-card"><h3>Address</h3><p>${escapeHtml(input.value)}</p></article>
+      </div>
+    `;
+  };
+  go.addEventListener("click", draw);
+  input.addEventListener("keydown", event => {
+    if (event.key === "Enter") draw();
   });
-
-  edge.addEventListener("click", async () => {
-    if (!nativeAPI) return;
-    const result = await nativeAPI.launchApp("edge", [normalizeUrl(input.value)]);
-    status.textContent = result.message;
-    showToast(result.message, result.ok ? "ok" : "error");
-  });
-
-  bar.append(input, launch, edge);
-  root.append(bar, status);
+  bar.append(input, go);
+  root.append(bar, page);
+  draw();
   return root;
 }
 

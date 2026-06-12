@@ -2,11 +2,13 @@
 
 Axyronis Computer System is an educational virtual computer system built with HTML, CSS, JavaScript, and Electron. It is not a phone OS, not a real operating system kernel, and not a replacement for Windows. It is a Windows-hosted computer desktop shell experiment designed for learning, UI prototyping, and creative remixing.
 
-![Axyronis command palette](AxyronisOS/preview-english-command-palette.png)
+![Axyronis command palette](AxyronisComputerSystem/preview-english-command-palette.png)
 
-![Axyronis advanced settings](AxyronisOS/preview-advanced-settings.png)
+![Axyronis advanced settings](AxyronisComputerSystem/preview-advanced-settings.png)
 
-![Axyronis wallpaper settings](AxyronisOS/preview-settings-wallpaper-v1.png)
+![Axyronis wallpaper settings](AxyronisComputerSystem/preview-settings-wallpaper-v1.png)
+
+![Axyronis internal Chrome](AxyronisComputerSystem/preview-internal-chrome-v1.png)
 
 ## Project Statement
 
@@ -30,7 +32,8 @@ The Settings app includes an Identity section so users can rename the system, de
 
 - Desktop shell with icons, taskbar, start menu, window manager, context menu, and glass-style UI.
 - Electron desktop mode with controlled native access through a preload bridge.
-- Real Windows app launcher for Chrome, Edge, File Explorer, Notepad, Calculator, Task Manager, Command Prompt, PowerShell, and Paint.
+- Internal Google Chrome style browser that opens Google inside the Axyronis computer system.
+- Real Windows app launcher for host apps such as Chrome, Edge, File Explorer, Notepad, Calculator, Task Manager, Command Prompt, PowerShell, and Paint.
 - Nebula Browser with a real Electron `webview`.
 - Local file browser in desktop mode.
 - Axyron Terminal with built-in commands and native command execution.
@@ -91,7 +94,7 @@ Install-Axyronis-Desktop.bat
 ### Manual Development Mode
 
 ```bash
-cd AxyronisOS
+cd AxyronisComputerSystem
 npm install
 npm start
 ```
@@ -101,7 +104,7 @@ npm start
 Open:
 
 ```text
-AxyronisOS/index.html
+AxyronisComputerSystem/index.html
 ```
 
 Browser preview mode cannot launch local Windows apps. Use Electron mode for native features.
@@ -109,7 +112,7 @@ Browser preview mode cannot launch local Windows apps. Use Electron mode for nat
 ## Project Structure
 
 ```text
-AxyronisOS/
+AxyronisComputerSystem/
   index.html          Main desktop shell markup
   styles.css          Visual system, layout, windows, panels, controls
   app.js              Desktop apps, window manager, command palette, UI logic
@@ -120,14 +123,14 @@ AxyronisOS/
 
 ## How To Modify It
 
-- Add a new built-in app in `AxyronisOS/app.js` by adding an entry to the `apps` array and writing a `renderYourApp()` function.
-- Add a real Windows launcher in `AxyronisOS/electron-main.js` by extending the `windowsApps` object.
-- Change the desktop theme in `AxyronisOS/styles.css`, especially the `:root` variables.
-- Change default names and settings in `defaultPreferences` inside `AxyronisOS/app.js`.
-- Add Command Palette actions in `getCommands()` inside `AxyronisOS/app.js`.
+- Add a new built-in app in `AxyronisComputerSystem/app.js` by adding an entry to the `apps` array and writing a `renderYourApp()` function.
+- Add a real Windows launcher in `AxyronisComputerSystem/electron-main.js` by extending the `windowsApps` object.
+- Change the desktop theme in `AxyronisComputerSystem/styles.css`, especially the `:root` variables.
+- Change default names and settings in `defaultPreferences` inside `AxyronisComputerSystem/app.js`.
+- Add Command Palette actions in `getCommands()` inside `AxyronisComputerSystem/app.js`.
 - Add Quick Center controls in `index.html` and style them in `styles.css`.
-- Add wallpaper presets in `wallpaperPresets` inside `AxyronisOS/app.js`.
-- Extend user identity controls in `defaultPreferences` and `renderSettings()` inside `AxyronisOS/app.js`.
+- Add wallpaper presets in `wallpaperPresets` inside `AxyronisComputerSystem/app.js`.
+- Extend user identity controls in `defaultPreferences` and `renderSettings()` inside `AxyronisComputerSystem/app.js`.
 
 ## Safety Notes
 

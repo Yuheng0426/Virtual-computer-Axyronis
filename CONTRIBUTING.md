@@ -20,7 +20,7 @@ Large rewrites are welcome. You may rename the project, replace the brand, redes
 Before submitting changes:
 
 ```bash
-cd AxyronisOS
+cd AxyronisComputerSystem
 npm run check
 npm audit --audit-level=high
 ```

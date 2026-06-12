@@ -63,6 +63,8 @@ The renderer calls:
 nativeAPI.launchApp("chrome");
 ```
 
+Desktop icons should generally open windows inside Axyronis. Host Windows apps belong in the Windows Apps launcher so the computer system feels self-contained.
+
 ## Security Pattern
 
 The renderer cannot access Node.js directly. This keeps the UI easier to reason about.

@@ -1,6 +1,6 @@
 @echo off
-if exist "%~dp0AxyronisOS\node_modules\electron\dist\electron.exe" (
-  start "" "%~dp0AxyronisOS\node_modules\electron\dist\electron.exe" "%~dp0AxyronisOS"
+if exist "%~dp0AxyronisComputerSystem\node_modules\electron\dist\electron.exe" (
+  start "" "%~dp0AxyronisComputerSystem\node_modules\electron\dist\electron.exe" "%~dp0AxyronisComputerSystem"
 ) else (
-  start "" "%~dp0AxyronisOS\index.html"
+  start "" "%~dp0AxyronisComputerSystem\index.html"
 )
