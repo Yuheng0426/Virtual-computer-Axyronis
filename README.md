@@ -32,7 +32,7 @@ The Settings app includes an Identity section so users can rename the system, de
 - Electron desktop mode with controlled native access through a preload bridge.
 - Internal Google Chrome style browser that opens Google inside the Axyronis computer system.
 - Browser downloads in Electron mode are saved into the Axyronis Desktop and appear as desktop file icons.
-- Immersive app windows can fill the whole desktop while the Dock auto-hides and appears near the bottom edge.
+- Maximized app windows can fill the whole desktop while the Dock auto-hides and appears near the bottom edge.
 - Real Windows app launcher for host apps such as Chrome, Edge, File Explorer, Notepad, Calculator, Task Manager, Command Prompt, PowerShell, and Paint.
 - Nebula Browser with a real Electron `webview`.
 - Local file browser in desktop mode.
@@ -78,7 +78,7 @@ Current settings include:
 Users can download different versions from GitHub tags or releases.
 
 - `v1.0.0`: First public learning release. Includes the desktop shell, taskbar, start menu, window manager, internal Chrome-style browser, Windows Apps launcher, Files, Terminal, Notes, System Monitor, Settings identity controls, wallpaper controls, avatar controls, language switching, and the Axyronis layered Settings layout.
-- `v1.1.0`: Usability and download release. Adds browser downloads that save to the Axyronis Desktop, desktop file icons for downloaded files, Files app access to the Axyronis Desktop folder, clearer Settings guidance, quick Settings actions, an auto-hiding Dock, immersive full-window app layouts, readable language selector styling, and a new version guide.
+- `v1.1.0`: Usability and download release. Adds browser downloads that save to the Axyronis Desktop, desktop file icons for downloaded files, Files app access to the Axyronis Desktop folder, clearer Settings guidance, quick Settings actions, Dock auto-hide while windows are maximized, full-window app layouts, readable language selector styling, and a new version guide.
 - `v1.2.0`: Reserved for the next feature update.
 
 Use `main` for the newest development version.

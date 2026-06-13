@@ -669,6 +669,10 @@ function wireGlobalEvents() {
     });
   }
   document.addEventListener("mousemove", event => {
+    if (!document.body.classList.contains("dock-auto-hide")) {
+      document.body.classList.remove("dock-visible");
+      return;
+    }
     const nearDock = event.clientY >= window.innerHeight - 34;
     const onDock = Boolean(event.target.closest?.(".taskbar"));
     document.body.classList.toggle("dock-visible", nearDock || onDock);
@@ -1063,14 +1067,12 @@ function openWindowApp(app) {
   const template = $("#windowTemplate").content.firstElementChild.cloneNode(true);
   const [width, height] = app.size;
   const offset = state.windows.size * 28;
-  const immersiveApps = new Set(["browser", "chrome", "settings"]);
-  const immersive = immersiveApps.has(id);
+  const dockSafeHeight = Math.max(300, window.innerHeight - 170);
   template.dataset.app = id;
-  template.classList.toggle("immersive-window", immersive);
-  template.style.width = `${immersive ? Math.max(860, window.innerWidth - 28) : Math.min(width, window.innerWidth - 24)}px`;
-  template.style.height = `${immersive ? Math.max(620, window.innerHeight - 28) : Math.min(height, window.innerHeight - 96)}px`;
-  template.style.left = `${immersive ? 14 : Math.max(12, 160 + offset)}px`;
-  template.style.top = `${immersive ? 14 : Math.max(12, 96 + offset)}px`;
+  template.style.width = `${Math.min(width, window.innerWidth - 24)}px`;
+  template.style.height = `${Math.min(height, dockSafeHeight)}px`;
+  template.style.left = `${Math.max(12, 160 + offset)}px`;
+  template.style.top = `${Math.max(12, 96 + offset)}px`;
   $(".app-symbol", template).textContent = app.symbol;
   $(".app-name", template).textContent = appDisplayName(app);
   $(".window-body", template).append(app.render());
@@ -1130,6 +1132,7 @@ function activateWindow(id) {
   entry.el.style.zIndex = ++state.z;
   $$(".app-window").forEach(win => win.classList.toggle("focused", win === entry.el));
   renderTaskbar();
+  updateDockMode();
 }
 
 function closeWindow(id) {
@@ -1139,6 +1142,7 @@ function closeWindow(id) {
   state.windows.delete(id);
   if (state.active === id) state.active = null;
   renderTaskbar();
+  updateDockMode();
 }
 
 function minimizeWindow(id) {
@@ -1147,6 +1151,7 @@ function minimizeWindow(id) {
   entry.el.classList.add("is-hidden");
   entry.minimized = true;
   renderTaskbar();
+  updateDockMode();
 }
 
 function toggleMaximize(id) {
@@ -1168,6 +1173,13 @@ function toggleMaximize(id) {
     entry.maximized = true;
   }
   activateWindow(id);
+}
+
+function updateDockMode() {
+  const activeEntry = state.active ? state.windows.get(state.active) : null;
+  const shouldAutoHide = Boolean(activeEntry && activeEntry.maximized && !activeEntry.el.classList.contains("is-hidden"));
+  document.body.classList.toggle("dock-auto-hide", shouldAutoHide);
+  if (!shouldAutoHide) document.body.classList.remove("dock-visible");
 }
 
 function renderTaskbar() {

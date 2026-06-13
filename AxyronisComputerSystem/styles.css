@@ -453,7 +453,7 @@ button {
   left: 50%;
   right: auto;
   width: min(920px, calc(100vw - 24px));
-  transform: translate(-50%, calc(100% + 22px)) scale(0.98);
+  transform: translate(-50%, 0) scale(1);
   bottom: 12px;
   height: 54px;
   display: flex;
@@ -466,7 +466,7 @@ button {
   backdrop-filter: blur(32px) saturate(160%);
   box-shadow: 0 18px 70px rgba(0, 0, 0, 0.46);
   border-radius: var(--radius);
-  opacity: 0;
+  opacity: 1;
   transition: transform 180ms ease, opacity 180ms ease;
 }
 
@@ -477,6 +477,15 @@ button {
   bottom: 0;
   height: 18px;
   z-index: 9999;
+}
+
+body.dock-auto-hide:not(.dock-visible) .taskbar {
+  opacity: 0;
+  transform: translate(-50%, calc(100% + 22px)) scale(0.98);
+}
+
+body:not(.dock-auto-hide) .dock-reveal-zone {
+  pointer-events: none;
 }
 
 body.dock-visible .taskbar,
@@ -1297,7 +1306,7 @@ body.dock-visible .taskbar,
 
 .app-window[data-app="settings"] {
   position: fixed;
-  inset: 14px !important;
+  inset: 14px 14px 76px 14px !important;
   width: auto !important;
   height: auto !important;
   resize: none;
@@ -1311,6 +1320,10 @@ body.dock-visible .taskbar,
 .app-window[data-app="settings"] .window-body {
   padding: 0;
   overflow: hidden;
+}
+
+.app-window[data-app="settings"].maximized {
+  inset: 14px !important;
 }
 
 .settings-v2 {
