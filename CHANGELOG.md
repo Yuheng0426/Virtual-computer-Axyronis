@@ -48,5 +48,5 @@ Future updates will use the same pattern:
 
 - `v1.1.0` for the usability and browser download update.
 - `v1.1.1` for the Axyronis Manager system-care update.
-- `v1.1.3` for the next feature update.
+- `v1.1.2` for the next feature update.
 - Patch versions such as `v1.0.1` for small fixes.

@@ -165,5 +165,5 @@ The repository uses Git tags for downloadable versions.
 v1.0.0   Settings wallpaper and identity release
 v1.1.0   Usability and browser download release
 v1.1.1   Axyronis Manager system-care release
-v1.1.3   Next feature update
+v1.1.2   Next feature update
 ```
