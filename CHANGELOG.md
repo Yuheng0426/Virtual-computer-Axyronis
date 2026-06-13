@@ -2,7 +2,7 @@
 
 This project uses Git tags so learners can download different versions over time.
 
-## v1.2.0 - Axyronis Manager Release
+## v1.1.1 - Axyronis Manager Release
 
 - Added Axyronis Manager as a system-level care center for performance, privacy, storage, downloads, web apps, and native power.
 - Added a health score, scan action, optimize action, and clear quick controls for system care.
@@ -10,7 +10,7 @@ This project uses Git tags so learners can download different versions over time
 - Added Manager settings for performance mode, Privacy Shield, Auto Care, and app shortcuts.
 - Added a Dock tray shortcut named `CARE` for fast access to Axyronis Manager.
 - Added a future-capability roadmap inside Manager so remixers can understand how to extend the system.
-- Updated package metadata to `1.2.0`.
+- Updated package metadata to `1.1.1`.
 
 ## v1.1.0 - Usability and Browser Download Release
 
@@ -47,6 +47,6 @@ This project uses Git tags so learners can download different versions over time
 Future updates will use the same pattern:
 
 - `v1.1.0` for the usability and browser download update.
-- `v1.2.0` for the Axyronis Manager system-care update.
-- `v1.3.0` for the next feature update.
+- `v1.1.1` for the Axyronis Manager system-care update.
+- `v1.2.0` for the next feature update.
 - Patch versions such as `v1.0.1` for small fixes.

@@ -105,7 +105,7 @@ For a major remix, start by changing `defaultPreferences`, the `apps` array, and
 
 ## Manager System
 
-Axyronis Manager is the system-care center added in `v1.2.0`.
+Axyronis Manager is the system-care center added in `v1.1.1`.
 
 Useful entry points:
 
@@ -164,5 +164,6 @@ The repository uses Git tags for downloadable versions.
 ```text
 v1.0.0   Settings wallpaper and identity release
 v1.1.0   Usability and browser download release
-v1.2.0   Axyronis Manager system-care release
+v1.1.1   Axyronis Manager system-care release
+v1.2.0   Next feature update
 ```
