@@ -207,6 +207,7 @@ const locales = {
       "shell.settings": "Settings",
       "shell.restartDemo": "Restart Demo",
       "shell.quickCenter": "Quick Center",
+      "shell.dock": "Dock",
       "shell.quantumLink": "Quantum Link",
       "shell.focusMode": "Focus Mode",
       "shell.nightShift": "Night Shift",
@@ -335,6 +336,7 @@ const locales = {
       "shell.settings": "设置",
       "shell.restartDemo": "重启演示",
       "shell.quickCenter": "快速中心",
+      "shell.dock": "程序坞",
       "shell.quantumLink": "量子连接",
       "shell.focusMode": "专注模式",
       "shell.nightShift": "夜间模式",
@@ -650,6 +652,14 @@ function wireGlobalEvents() {
   $("#commandPalette").addEventListener("click", event => {
     if (event.target.id === "commandPalette") closeCommandPalette();
   });
+  const dock = $(".taskbar");
+  const dockZone = $(".dock-reveal-zone");
+  if (dock && dockZone) {
+    [dock, dockZone].forEach(item => {
+      item.addEventListener("mouseenter", () => document.body.classList.add("dock-visible"));
+      item.addEventListener("mouseleave", () => document.body.classList.remove("dock-visible"));
+    });
+  }
   if (nativeAPI?.onDesktopDownloadsChanged) {
     nativeAPI.onDesktopDownloadsChanged(payload => {
       if (payload.status === "started") showToast(`${t("toast.downloadStarted")}: ${payload.fileName}`);
@@ -658,6 +668,11 @@ function wireGlobalEvents() {
       loadDesktopFiles();
     });
   }
+  document.addEventListener("mousemove", event => {
+    const nearDock = event.clientY >= window.innerHeight - 34;
+    const onDock = Boolean(event.target.closest?.(".taskbar"));
+    document.body.classList.toggle("dock-visible", nearDock || onDock);
+  });
   $$(".quick-toggle").forEach(toggle => {
     toggle.addEventListener("click", () => toggle.classList.toggle("active"));
   });
@@ -1048,12 +1063,14 @@ function openWindowApp(app) {
   const template = $("#windowTemplate").content.firstElementChild.cloneNode(true);
   const [width, height] = app.size;
   const offset = state.windows.size * 28;
-  const roomySettings = id === "settings";
+  const immersiveApps = new Set(["browser", "chrome", "settings"]);
+  const immersive = immersiveApps.has(id);
   template.dataset.app = id;
-  template.style.width = `${roomySettings ? Math.max(860, window.innerWidth - 28) : Math.min(width, window.innerWidth - 24)}px`;
-  template.style.height = `${roomySettings ? Math.max(620, window.innerHeight - 92) : Math.min(height, window.innerHeight - 96)}px`;
-  template.style.left = `${roomySettings ? 14 : Math.max(12, 160 + offset)}px`;
-  template.style.top = `${roomySettings ? 14 : Math.max(12, 96 + offset)}px`;
+  template.classList.toggle("immersive-window", immersive);
+  template.style.width = `${immersive ? Math.max(860, window.innerWidth - 28) : Math.min(width, window.innerWidth - 24)}px`;
+  template.style.height = `${immersive ? Math.max(620, window.innerHeight - 28) : Math.min(height, window.innerHeight - 96)}px`;
+  template.style.left = `${immersive ? 14 : Math.max(12, 160 + offset)}px`;
+  template.style.top = `${immersive ? 14 : Math.max(12, 96 + offset)}px`;
   $(".app-symbol", template).textContent = app.symbol;
   $(".app-name", template).textContent = appDisplayName(app);
   $(".window-body", template).append(app.render());

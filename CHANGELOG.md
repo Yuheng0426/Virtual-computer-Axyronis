@@ -9,6 +9,9 @@ This project uses Git tags so learners can download different versions over time
 - Added Axyronis Desktop access inside the Files app.
 - Added browser download hints so users know where downloaded files go.
 - Improved Settings with clearer guidance text and quick actions.
+- Added immersive full-window app layouts for browser and Settings views.
+- Added an auto-hiding Dock that appears when the pointer reaches the bottom edge.
+- Improved the Settings language selector so options remain readable in dark mode.
 - Added a version guide describing what each release includes.
 - Updated package metadata to `1.1.0`.
 

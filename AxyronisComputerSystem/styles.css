@@ -270,7 +270,7 @@ button {
 
 .window-layer {
   position: absolute;
-  inset: 0 0 64px 0;
+  inset: 0;
   pointer-events: none;
 }
 
@@ -346,7 +346,15 @@ button {
 }
 
 .app-window.maximized {
-  inset: 12px 12px 76px 12px !important;
+  inset: 12px !important;
+  width: auto !important;
+  height: auto !important;
+  resize: none;
+}
+
+.app-window.immersive-window {
+  position: fixed;
+  inset: 14px !important;
   width: auto !important;
   height: auto !important;
   resize: none;
@@ -445,7 +453,7 @@ button {
   left: 50%;
   right: auto;
   width: min(920px, calc(100vw - 24px));
-  transform: translateX(-50%);
+  transform: translate(-50%, calc(100% + 22px)) scale(0.98);
   bottom: 12px;
   height: 54px;
   display: flex;
@@ -458,6 +466,24 @@ button {
   backdrop-filter: blur(32px) saturate(160%);
   box-shadow: 0 18px 70px rgba(0, 0, 0, 0.46);
   border-radius: var(--radius);
+  opacity: 0;
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+
+.dock-reveal-zone {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 18px;
+  z-index: 9999;
+}
+
+body.dock-visible .taskbar,
+.taskbar:hover,
+.dock-reveal-zone:hover + .taskbar {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
 }
 
 .start-button {
@@ -1271,7 +1297,7 @@ button {
 
 .app-window[data-app="settings"] {
   position: fixed;
-  inset: 14px 14px 76px 14px !important;
+  inset: 14px !important;
   width: auto !important;
   height: auto !important;
   resize: none;
@@ -1472,6 +1498,24 @@ button {
   color: var(--text);
   background: rgba(255, 255, 255, 0.08);
   border-radius: 7px;
+}
+
+.settings-row select {
+  color-scheme: dark;
+  border-color: rgba(51, 224, 194, 0.3);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.035)),
+    #171a25;
+}
+
+.settings-row select option {
+  color: #f6f8fb;
+  background: #171a25;
+}
+
+.settings-row select option:checked {
+  color: #03120f;
+  background: var(--accent);
 }
 
 .avatar-setting {
