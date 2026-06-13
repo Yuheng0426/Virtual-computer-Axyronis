@@ -103,6 +103,22 @@ Display language strings live in the `locales` object inside `app.js`. Add a new
 
 For a major remix, start by changing `defaultPreferences`, the `apps` array, and the design tokens in `styles.css`.
 
+## Manager System
+
+Axyronis Manager is the system-care center added in `v1.2.0`.
+
+Useful entry points:
+
+```text
+webShortcuts          Internal web app shortcuts opened inside Axyronis Chrome
+renderManager()       Builds the Manager dashboard
+runManagerScan()      Updates the health score and status
+optimizeAxyronis()    Closes transient panels and refreshes the workspace
+managerPanel()        Reusable Manager section helper
+```
+
+Manager is intentionally safe by default. It can refresh the shell, open Settings, open Files, launch internal web apps, and route users to approved native launchers. Destructive system cleaning should be added only with clear confirmations and a carefully reviewed native bridge.
+
 ## Wallpaper System
 
 Wallpaper presets live in `wallpaperPresets` inside `app.js`.
@@ -148,5 +164,5 @@ The repository uses Git tags for downloadable versions.
 ```text
 v1.0.0   Settings wallpaper and identity release
 v1.1.0   Usability and browser download release
-v1.2.0   Next feature update
+v1.2.0   Axyronis Manager system-care release
 ```

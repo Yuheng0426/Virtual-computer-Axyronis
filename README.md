@@ -18,7 +18,7 @@ Axyronis can launch real Windows programs when running in Electron mode, so trea
 
 I will keep updating and improving this computer system over time. The goal is to make Axyronis more useful for learners, remixers, UI designers, and people studying how a virtual computer desktop can be built.
 
-Released versions are published with Git tags so users can download different versions. The current version is `v1.1.0`, the Settings usability and browser-download desktop release. Future feature releases will continue as `v1.2.0`, `v1.3.0`, and so on.
+Released versions are published with Git tags so users can download different versions. The current version is `v1.2.0`, the Axyronis Manager system-care release. Future feature releases will continue as `v1.3.0`, `v1.4.0`, and so on.
 
 ## Remix Freedom
 
@@ -31,6 +31,8 @@ The Settings app includes an Identity section so users can rename the system, de
 - Desktop shell with icons, taskbar, start menu, window manager, context menu, and glass-style UI.
 - Electron desktop mode with controlled native access through a preload bridge.
 - Internal Google Chrome style browser that opens Google inside the Axyronis computer system.
+- Axyronis Manager system-care center for performance, privacy, storage, downloads, web apps, and native-power shortcuts.
+- Web App Dock shortcuts for Google Search, Gmail, Outlook, WhatsApp Web, Discord, X, Instagram, YouTube, GitHub, and Google Docs inside the internal Chrome window.
 - Browser downloads in Electron mode are saved into the Axyronis Desktop and appear as desktop file icons.
 - Maximized app windows can fill the whole desktop while the Dock auto-hides and appears near the bottom edge.
 - Real Windows app launcher for host apps such as Chrome, Edge, File Explorer, Notepad, Calculator, Task Manager, Command Prompt, PowerShell, and Paint.
@@ -58,6 +60,10 @@ Current settings include:
 
 - Home dashboard
 - Layered category navigation
+- Axyronis Manager controls
+- Performance Mode
+- Privacy Shield
+- Auto Care
 - System Name
 - Desktop Brand
 - User Name
@@ -79,7 +85,8 @@ Users can download different versions from GitHub tags or releases.
 
 - `v1.0.0`: First public learning release. Includes the desktop shell, taskbar, start menu, window manager, internal Chrome-style browser, Windows Apps launcher, Files, Terminal, Notes, System Monitor, Settings identity controls, wallpaper controls, avatar controls, language switching, and the Axyronis layered Settings layout.
 - `v1.1.0`: Usability and download release. Adds browser downloads that save to the Axyronis Desktop, desktop file icons for downloaded files, Files app access to the Axyronis Desktop folder, clearer Settings guidance, quick Settings actions, Dock auto-hide while windows are maximized, full-window app layouts, readable language selector styling, and a new version guide.
-- `v1.2.0`: Reserved for the next feature update.
+- `v1.2.0`: Axyronis Manager release. Adds a system-care center, health scan, workspace optimization, privacy controls, storage/download shortcuts, Web App Dock, internal Chrome web-app launching, Manager settings, and the `CARE` Dock shortcut.
+- `v1.3.0`: Reserved for the next feature update.
 
 Use `main` for the newest development version.
 
@@ -137,6 +144,7 @@ AxyronisComputerSystem/
 - Change default names and settings in `defaultPreferences` inside `AxyronisComputerSystem/app.js`.
 - Add Command Palette actions in `getCommands()` inside `AxyronisComputerSystem/app.js`.
 - Add Quick Center controls in `index.html` and style them in `styles.css`.
+- Add Manager actions or web shortcuts in `renderManager()` and `webShortcuts` inside `AxyronisComputerSystem/app.js`.
 - Add wallpaper presets in `wallpaperPresets` inside `AxyronisComputerSystem/app.js`.
 - Extend user identity controls in `defaultPreferences` and `renderSettings()` inside `AxyronisComputerSystem/app.js`.
 

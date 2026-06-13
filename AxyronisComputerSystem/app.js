@@ -35,6 +35,14 @@ const apps = [
     render: renderChromeBrowser
   },
   {
+    id: "manager",
+    name: "Axyronis Manager",
+    symbol: "C",
+    desktop: true,
+    size: [1060, 680],
+    render: renderManager
+  },
+  {
     id: "windowsApps",
     name: "Windows Apps",
     symbol: "W",
@@ -163,6 +171,9 @@ const defaultPreferences = {
   wallpaperSource: "Built-in preset",
   glassBlur: 30,
   startupMode: "clean",
+  performanceMode: "balanced",
+  privacyShield: true,
+  managerAutoCare: true,
   language: "en-US"
 };
 
@@ -178,9 +189,25 @@ const state = {
   settingsPage: "home",
   fileLocation: "Desktop",
   desktopFiles: [],
+  chromeUrl: "https://www.google.com/?hl=en",
+  managerScore: 94,
+  managerLastScan: "Ready",
   accent: preferences.accent,
   lightMode: preferences.lightMode
 };
+
+const webShortcuts = [
+  { name: "Google Search", url: "https://www.google.com/?hl=en", type: "Search" },
+  { name: "Gmail", url: "https://mail.google.com", type: "Email" },
+  { name: "Outlook", url: "https://outlook.live.com/mail/", type: "Email" },
+  { name: "WhatsApp Web", url: "https://web.whatsapp.com", type: "Messaging" },
+  { name: "Discord", url: "https://discord.com/app", type: "Community" },
+  { name: "X", url: "https://x.com", type: "Social" },
+  { name: "Instagram", url: "https://www.instagram.com", type: "Social" },
+  { name: "YouTube", url: "https://www.youtube.com", type: "Video" },
+  { name: "GitHub", url: "https://github.com", type: "Developer" },
+  { name: "Google Docs", url: "https://docs.google.com", type: "Office" }
+];
 
 // Localized shell strings. Add a new language by copying the English object and
 // replacing the values. User-created names such as systemName stay editable in
@@ -193,6 +220,7 @@ const locales = {
       "app.files.name": "Axyronis Files",
       "app.browser.name": "Nebula Browser",
       "app.chrome.name": "Google Chrome",
+      "app.manager.name": "Axyronis Manager",
       "app.windowsApps.name": "Windows Apps",
       "app.terminal.name": "Axyron Terminal",
       "app.notes.name": "Stardust Notes",
@@ -255,6 +283,7 @@ const locales = {
       "settings.privacy": "Privacy & security",
       "settings.update": "System Updates",
       "settings.developer": "Developer",
+      "settings.manager": "Axyronis Manager",
       "settings.display": "Display",
       "settings.sound": "Sound",
       "settings.power": "Power",
@@ -305,6 +334,39 @@ const locales = {
       "settings.guideHome": "Use the left rail for major areas, the large cards for common tasks, and each detail page for the actual controls.",
       "settings.quickActions": "Quick actions",
       "settings.openDownloads": "Open Axyronis Desktop",
+      "settings.performanceMode": "Performance Mode",
+      "settings.balancedMode": "Balanced",
+      "settings.creatorMode": "Creator",
+      "settings.gamingMode": "Gaming",
+      "settings.privacyShield": "Privacy Shield",
+      "settings.managerAutoCare": "Auto Care",
+      "manager.title": "Axyronis Manager",
+      "manager.subtitle": "One control center for performance, privacy, downloads, web apps, and system growth.",
+      "manager.systemCare": "System Care",
+      "manager.systemCareDesc": "Scan shell health, refresh the desktop, and keep the workspace smooth.",
+      "manager.scan": "Run Scan",
+      "manager.optimize": "Optimize",
+      "manager.openSettings": "Open Settings",
+      "manager.security": "Privacy Guard",
+      "manager.securityDesc": "Local-first settings, controlled native bridge, and safer browser download routing.",
+      "manager.storage": "Storage Desk",
+      "manager.storageDesc": "Downloads from internal browsers land on the Axyronis Desktop.",
+      "manager.openDownloads": "Open Downloads",
+      "manager.webApps": "Web App Dock",
+      "manager.webAppsDesc": "Open web apps inside the Axyronis Chrome window for email, social, video, office, and developer work.",
+      "manager.nativePower": "Native Power",
+      "manager.nativePowerDesc": "Desktop edition can launch approved Windows apps and read local folders through Electron.",
+      "manager.launchWindows": "Launch Windows Apps",
+      "manager.workspace": "Workspace",
+      "manager.workspaceDesc": "Arrange Files, Browser, Terminal, and Monitor into a productive layout.",
+      "manager.startWorkspace": "Start Workspace",
+      "manager.future": "Beyond Windows Ideas",
+      "manager.futureDesc": "Axyronis can grow with remixable settings, internal web apps, desktop downloads, privacy controls, and creator-first automation.",
+      "manager.lastScan": "Last scan",
+      "manager.healthExcellent": "Excellent",
+      "manager.healthReady": "Ready",
+      "manager.scanComplete": "Manager scan complete",
+      "manager.optimized": "Workspace optimized",
       "files.axyronisDesktop": "Axyronis Desktop",
       "files.downloadHint": "Browser downloads appear here and on the desktop.",
       "browser.downloadHint": "Downloads save to Axyronis Desktop",
@@ -584,6 +646,7 @@ function updatePreference(key, value) {
   savePreferences();
   applyPreferences();
   refreshOpenSettingsPanels();
+  refreshOpenManagerPanel();
 }
 
 function resetPreferences() {
@@ -792,6 +855,14 @@ function refreshOpenFilesPanels() {
   body.append(renderFiles());
 }
 
+function refreshOpenManagerPanel() {
+  const entry = state.windows.get("manager");
+  if (!entry) return;
+  const body = $(".window-body", entry.el);
+  body.innerHTML = "";
+  body.append(renderManager());
+}
+
 function renderDesktopIcons() {
   const desktop = $("#desktopIcons");
   desktop.innerHTML = "";
@@ -894,6 +965,26 @@ function getCommands() {
       run: () => openApp("chrome")
     },
     {
+      title: "Open Axyronis Manager",
+      detail: "System care, privacy, storage, and web app dock",
+      run: () => openApp("manager")
+    },
+    {
+      title: "Run Manager Scan",
+      detail: "Check Axyronis shell health",
+      run: runManagerScan
+    },
+    {
+      title: "Open Gmail",
+      detail: "Use email inside Axyronis Chrome",
+      run: () => openWebShortcut("https://mail.google.com", "Gmail")
+    },
+    {
+      title: "Open Discord",
+      detail: "Use social apps inside Axyronis Chrome",
+      run: () => openWebShortcut("https://discord.com/app", "Discord")
+    },
+    {
       title: "Open Windows App Center",
       detail: "Launch real Windows programs",
       run: () => openApp("windowsApps")
@@ -919,6 +1010,53 @@ function getCommands() {
       run: refreshDesktop
     }
   ];
+}
+
+function openWebShortcut(url, label = "Web app") {
+  openChromeUrl(url);
+  showToast(`${label} opened inside Axyronis Chrome`);
+}
+
+function openChromeUrl(url) {
+  state.chromeUrl = normalizeUrl(url);
+  const existing = state.windows.get("chrome");
+  if (!existing) {
+    openApp("chrome");
+    return;
+  }
+
+  existing.el.classList.remove("is-hidden");
+  existing.minimized = false;
+  activateWindow("chrome");
+  const input = $(".chrome-bar input", existing.el);
+  const webview = $("webview", existing.el);
+  if (input) input.value = state.chromeUrl;
+  if (webview) {
+    webview.src = state.chromeUrl;
+    return;
+  }
+
+  const body = $(".window-body", existing.el);
+  body.innerHTML = "";
+  body.append(renderChromeBrowser());
+}
+
+function runManagerScan() {
+  state.managerScore = clamp(Math.round(90 + Math.random() * 8), 90, 99);
+  state.managerLastScan = new Date().toLocaleTimeString(preferences.language, { hour: "2-digit", minute: "2-digit" });
+  refreshOpenManagerPanel();
+  showToast(`${t("manager.scanComplete")}: ${state.managerScore}%`);
+}
+
+function optimizeAxyronis() {
+  closeStart();
+  closeQuickCenter();
+  closeCommandPalette();
+  refreshDesktop();
+  state.managerScore = clamp(state.managerScore + 2, 0, 99);
+  state.managerLastScan = t("manager.optimized");
+  refreshOpenManagerPanel();
+  showToast(t("manager.optimized"));
 }
 
 function renderCommandResults() {
@@ -947,6 +1085,7 @@ function openSettingsSection(section = "identity") {
     wallpaper: ["personalization", "wallpaper"],
     desktop: ["system", "desktop"],
     startup: ["apps", "startup"],
+    manager: ["manager", "managerHome"],
     language: ["time", "language"],
     developer: ["developer", "developer"]
   };
@@ -1463,12 +1602,13 @@ function renderChromeBrowser() {
   const webview = document.createElement("webview");
   webview.className = "webview";
   webview.setAttribute("allowpopups", "");
-  input.value = "https://www.google.com/?hl=en";
+  input.value = state.chromeUrl || "https://www.google.com/?hl=en";
   webview.src = input.value;
 
   const navigate = () => {
     const url = normalizeUrl(input.value);
     input.value = url;
+    state.chromeUrl = url;
     webview.src = url;
   };
 
@@ -1481,13 +1621,16 @@ function renderChromeBrowser() {
   reload.addEventListener("click", () => webview.reload());
   home.addEventListener("click", () => {
     input.value = "https://www.google.com/?hl=en";
+    state.chromeUrl = input.value;
     navigate();
   });
   webview.addEventListener("did-navigate", event => {
     input.value = event.url;
+    state.chromeUrl = event.url;
   });
   webview.addEventListener("did-navigate-in-page", event => {
     input.value = event.url;
+    state.chromeUrl = event.url;
   });
 
   bar.append(back, forward, reload, home, input, go, downloadHint);
@@ -1499,10 +1642,12 @@ function renderBrowserOnlyChrome() {
   const root = div("app-layout");
   const bar = div("browser-bar");
   const input = document.createElement("input");
-  input.value = "https://www.google.com/?hl=en";
+  input.value = state.chromeUrl || "https://www.google.com/?hl=en";
   const go = button("Go", "text-button primary");
   const page = div("browser-page");
   const draw = () => {
+    state.chromeUrl = normalizeUrl(input.value);
+    input.value = state.chromeUrl;
     page.innerHTML = `
       <section class="portal-hero">
         <h2>Google Chrome</h2>
@@ -1522,6 +1667,128 @@ function renderBrowserOnlyChrome() {
   root.append(bar, page);
   draw();
   return root;
+}
+
+function renderManager() {
+  const root = div("app-layout manager-app");
+  const hero = div("manager-hero");
+  hero.innerHTML = `
+    <div>
+      <span class="manager-eyebrow">${t("manager.healthExcellent")}</span>
+      <h2>${t("manager.title")}</h2>
+      <p>${t("manager.subtitle")}</p>
+    </div>
+    <div class="manager-score" aria-label="System health score">
+      <strong>${state.managerScore}</strong>
+      <span>${t("manager.systemCare")}</span>
+    </div>
+  `;
+
+  const actionRow = div("manager-actions");
+  [
+    [t("manager.scan"), runManagerScan, "primary"],
+    [t("manager.optimize"), optimizeAxyronis, ""],
+    [t("manager.openSettings"), () => openSettingsSection("manager"), ""],
+    [t("manager.openDownloads"), () => openApp("files"), ""]
+  ].forEach(([label, action, tone]) => {
+    const actionButton = button(label, `text-button ${tone}`.trim());
+    actionButton.addEventListener("click", action);
+    actionRow.append(actionButton);
+  });
+
+  const statusGrid = div("manager-status-grid");
+  [
+    ["CPU", "34%", "Axyron Core X8"],
+    ["Memory", "58%", "16 GB virtual"],
+    ["Network", "Secure", t("shell.quantumLink")],
+    [t("manager.lastScan"), state.managerLastScan, t("manager.healthReady")]
+  ].forEach(([label, value, detail]) => {
+    const card = div("manager-mini-card");
+    card.innerHTML = `<span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong><small>${escapeHtml(detail)}</small>`;
+    statusGrid.append(card);
+  });
+
+  const care = managerPanel(t("manager.systemCare"), t("manager.systemCareDesc"), [
+    managerActionButton(t("manager.scan"), runManagerScan),
+    managerActionButton(t("manager.optimize"), optimizeAxyronis),
+    managerActionButton(t("settings.powerWorkspace"), openPowerWorkspace)
+  ]);
+
+  const security = managerPanel(t("manager.security"), t("manager.securityDesc"), [
+    managerToggle(t("settings.privacyShield"), "privacyShield"),
+    managerToggle(t("settings.managerAutoCare"), "managerAutoCare"),
+    managerActionButton(t("settings.developer"), () => openSettingsSection("developer"))
+  ]);
+
+  const storage = managerPanel(t("manager.storage"), t("manager.storageDesc"), [
+    managerActionButton(t("manager.openDownloads"), () => openApp("files")),
+    managerActionButton(t("settings.wallpaper"), () => openSettingsSection("wallpaper")),
+    managerActionButton(t("settings.refresh"), loadDesktopFiles)
+  ]);
+
+  const nativePower = managerPanel(t("manager.nativePower"), t("manager.nativePowerDesc"), [
+    managerActionButton(t("manager.launchWindows"), () => openApp("windowsApps")),
+    managerActionButton(t("shell.openTerminal"), () => openApp("terminal")),
+    managerActionButton(t("settings.open"), () => openApp("system"))
+  ]);
+
+  const webDock = div("manager-panel manager-web-panel");
+  webDock.innerHTML = `<h3>${t("manager.webApps")}</h3><p>${t("manager.webAppsDesc")}</p>`;
+  const webGrid = div("manager-web-grid");
+  webShortcuts.forEach(item => {
+    const card = document.createElement("button");
+    card.className = "manager-web-card";
+    card.innerHTML = `
+      <span class="icon-tile">${escapeHtml(item.name.slice(0, 1).toUpperCase())}</span>
+      <strong>${escapeHtml(item.name)}</strong>
+      <small>${escapeHtml(item.type)}</small>
+    `;
+    card.addEventListener("click", () => openWebShortcut(item.url, item.name));
+    webGrid.append(card);
+  });
+  webDock.append(webGrid);
+
+  const future = div("manager-future");
+  future.innerHTML = `
+    <h3>${t("manager.future")}</h3>
+    <p>${t("manager.futureDesc")}</p>
+    <div class="manager-roadmap">
+      <span>Internal web apps</span>
+      <span>Desktop downloads</span>
+      <span>Remixable settings</span>
+      <span>Native app bridge</span>
+      <span>Creator automation</span>
+    </div>
+  `;
+
+  const columns = div("manager-columns");
+  columns.append(care, security, storage, nativePower);
+  root.append(hero, actionRow, statusGrid, columns, webDock, future);
+  return root;
+}
+
+function managerPanel(title, description, actions) {
+  const panel = div("manager-panel");
+  panel.innerHTML = `<h3>${escapeHtml(title)}</h3><p>${escapeHtml(description)}</p>`;
+  const list = div("manager-panel-actions");
+  actions.forEach(action => list.append(action));
+  panel.append(list);
+  return panel;
+}
+
+function managerActionButton(label, action) {
+  const actionButton = button(label, "manager-action");
+  actionButton.addEventListener("click", action);
+  return actionButton;
+}
+
+function managerToggle(label, key) {
+  const row = div("manager-toggle-row");
+  const toggle = button("", `toggle ${preferences[key] ? "on" : ""}`);
+  toggle.title = label;
+  toggle.addEventListener("click", () => updatePreference(key, !preferences[key]));
+  row.append(labelNode(label), toggle);
+  return row;
 }
 
 function renderWindowsApps() {
@@ -1748,6 +2015,7 @@ function renderSettings() {
   const accents = ["#33e0c2", "#ff5fa2", "#ffc857", "#7c8cff", "#65f283"];
   const categories = [
     { id: "home", icon: "H", label: t("settings.home"), desc: t("settings.recommendedDesc"), pages: [] },
+    { id: "manager", icon: "C", label: t("settings.manager"), desc: t("manager.subtitle"), pages: ["managerHome", "managerSecurity", "managerApps"] },
     { id: "system", icon: "S", label: t("settings.system"), desc: "Display, sound, power, and desktop behavior.", pages: ["display", "sound", "power", "desktop"] },
     { id: "devices", icon: "B", label: t("settings.devices"), desc: "Bluetooth, cameras, printers, and connected devices.", pages: ["bluetooth", "camera", "printers"] },
     { id: "network", icon: "N", label: t("settings.network"), desc: "Connection status, Wi-Fi, and online services.", pages: ["wifi", "internet"] },
@@ -1763,6 +2031,9 @@ function renderSettings() {
   ];
   const pageMeta = {
     display: [t("settings.display"), "Scale, brightness, and display comfort."],
+    managerHome: [t("settings.manager"), t("manager.systemCareDesc")],
+    managerSecurity: [t("manager.security"), t("manager.securityDesc")],
+    managerApps: [t("manager.webApps"), t("manager.webAppsDesc")],
     sound: [t("settings.sound"), "Volume, microphone, and audio routing."],
     power: [t("settings.power"), "Startup mode, workspace restore, and performance profile."],
     desktop: [t("settings.desktopBehavior"), t("settings.desktopDesc")],
@@ -1860,6 +2131,7 @@ function renderSettings() {
     const recommended = div("setting-block settings-stack");
     recommended.innerHTML = `<h3>${t("settings.recommended")}</h3><p>${t("settings.recommendedDesc")}</p>`;
     [
+      [t("settings.manager"), "managerHome", "manager"],
       [t("settings.camera"), "camera", "devices"],
       [t("settings.microphone"), "sound", "system"],
       [t("settings.printers"), "printers", "devices"]
@@ -1954,6 +2226,37 @@ function renderSettings() {
       panel.append(renderWallpaperSettings());
       panel.append(settingsBlock(t("settings.wallpaperTuning"), t("settings.wallpaperDesc"), [
         rangeSetting(t("settings.wallpaperDim"), "wallpaperDim", 0, 70)
+      ]));
+    }
+
+    if (page === "managerHome") {
+      panel.append(settingsBlock(t("settings.manager"), t("manager.systemCareDesc"), [
+        selectSetting(t("settings.performanceMode"), "performanceMode", [
+          ["balanced", t("settings.balancedMode")],
+          ["creator", t("settings.creatorMode")],
+          ["gaming", t("settings.gamingMode")]
+        ]),
+        actionSetting(t("manager.scan"), t("manager.scan"), runManagerScan),
+        actionSetting(t("manager.optimize"), t("manager.optimize"), optimizeAxyronis),
+        actionSetting(t("settings.open"), t("settings.open"), () => openApp("manager"))
+      ]));
+    }
+
+    if (page === "managerSecurity") {
+      panel.append(settingsBlock(t("manager.security"), t("manager.securityDesc"), [
+        toggleSetting(t("settings.privacyShield"), "privacyShield"),
+        toggleSetting(t("settings.managerAutoCare"), "managerAutoCare"),
+        actionSetting(t("settings.privacy"), t("settings.open"), () => route("privacy", "privacy")),
+        actionSetting(t("settings.developer"), t("settings.open"), () => route("developer", "developer"))
+      ]));
+    }
+
+    if (page === "managerApps") {
+      panel.append(settingsBlock(t("manager.webApps"), t("manager.webAppsDesc"), [
+        actionSetting("Google Search", t("settings.open"), () => openWebShortcut("https://www.google.com/?hl=en", "Google Search")),
+        actionSetting("Gmail", t("settings.open"), () => openWebShortcut("https://mail.google.com", "Gmail")),
+        actionSetting("Discord", t("settings.open"), () => openWebShortcut("https://discord.com/app", "Discord")),
+        actionSetting(t("manager.launchWindows"), t("settings.open"), () => openApp("windowsApps"))
       ]));
     }
 

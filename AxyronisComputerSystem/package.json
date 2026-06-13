@@ -1,6 +1,6 @@
 {
   "name": "axyronis-computer-system",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Axyronis personal virtual computer system",
   "main": "electron-main.js",
   "private": true,
