@@ -2,6 +2,16 @@
 
 This project uses Git tags so learners can download different versions over time.
 
+## v1.1.0 - Usability and Browser Download Release
+
+- Added Electron download routing so browser and webview downloads save into the Axyronis Desktop.
+- Added downloaded file icons to the Axyronis desktop.
+- Added Axyronis Desktop access inside the Files app.
+- Added browser download hints so users know where downloaded files go.
+- Improved Settings with clearer guidance text and quick actions.
+- Added a version guide describing what each release includes.
+- Updated package metadata to `1.1.0`.
+
 ## v1.0.0 - Settings Wallpaper and Identity Release
 
 - Rebuilt Settings into an Axyronis layered control center with Home, categories, and detail pages.
@@ -23,6 +33,6 @@ This project uses Git tags so learners can download different versions over time
 
 Future updates will use the same pattern:
 
-- `v1.1.0` for the next feature update.
-- `v1.2.0` for later feature updates.
+- `v1.1.0` for the usability and browser download update.
+- `v1.2.0` for the next feature update.
 - Patch versions such as `v1.0.1` for small fixes.

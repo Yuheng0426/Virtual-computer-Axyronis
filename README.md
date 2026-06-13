@@ -18,7 +18,7 @@ Axyronis can launch real Windows programs when running in Electron mode, so trea
 
 I will keep updating and improving this computer system over time. The goal is to make Axyronis more useful for learners, remixers, UI designers, and people studying how a virtual computer desktop can be built.
 
-Released versions are published with Git tags so users can download different versions. The current version is `v1.0.0`, the Settings wallpaper and identity release. Future feature releases will continue as `v1.1.0`, `v1.2.0`, and so on.
+Released versions are published with Git tags so users can download different versions. The current version is `v1.1.0`, the Settings usability and browser-download desktop release. Future feature releases will continue as `v1.2.0`, `v1.3.0`, and so on.
 
 ## Remix Freedom
 
@@ -31,6 +31,7 @@ The Settings app includes an Identity section so users can rename the system, de
 - Desktop shell with icons, taskbar, start menu, window manager, context menu, and glass-style UI.
 - Electron desktop mode with controlled native access through a preload bridge.
 - Internal Google Chrome style browser that opens Google inside the Axyronis computer system.
+- Browser downloads in Electron mode are saved into the Axyronis Desktop and appear as desktop file icons.
 - Real Windows app launcher for host apps such as Chrome, Edge, File Explorer, Notepad, Calculator, Task Manager, Command Prompt, PowerShell, and Paint.
 - Nebula Browser with a real Electron `webview`.
 - Local file browser in desktop mode.
@@ -41,6 +42,7 @@ The Settings app includes an Identity section so users can rename the system, de
 - Advanced Settings app with Identity, Appearance, Desktop, Startup, and Developer sections.
 - Axyronis layered Settings control center with Home, category pages, and detail pages.
 - Distinct Axyronis Settings layout that fills the desktop workspace without copying Windows visual structure.
+- Clear Settings guidance cards and quick actions so the system stays easy to understand.
 - Display language switching from Settings, with instant updates across the shell, Start menu, desktop icons, taskbar, and Settings.
 - User-editable system name, desktop brand, user name, device name, and boot subtitle.
 - Wallpaper controls inside Settings, with built-in presets and local image selection in Electron mode.
@@ -73,9 +75,9 @@ Current settings include:
 
 Users can download different versions from GitHub tags or releases.
 
-- `v1.0.0`: Settings wallpaper and identity release.
-- `v1.1.0`: Reserved for the next feature update.
-- `v1.2.0`: Reserved for later feature updates.
+- `v1.0.0`: First public learning release. Includes the desktop shell, taskbar, start menu, window manager, internal Chrome-style browser, Windows Apps launcher, Files, Terminal, Notes, System Monitor, Settings identity controls, wallpaper controls, avatar controls, language switching, and the Axyronis layered Settings layout.
+- `v1.1.0`: Usability and download release. Adds browser downloads that save to the Axyronis Desktop, desktop file icons for downloaded files, Files app access to the Axyronis Desktop folder, clearer Settings guidance, quick Settings actions, and a new version guide.
+- `v1.2.0`: Reserved for the next feature update.
 
 Use `main` for the newest development version.
 

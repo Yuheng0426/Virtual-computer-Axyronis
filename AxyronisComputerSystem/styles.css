@@ -243,6 +243,10 @@ button {
   outline: none;
 }
 
+.desktop-file .icon-tile {
+  background: linear-gradient(145deg, var(--accent-3), #eef7ff);
+}
+
 .icon-tile {
   width: 42px;
   height: 42px;
@@ -1422,6 +1426,16 @@ button {
   font-size: 16px;
 }
 
+.settings-guide-card {
+  min-height: 96px;
+}
+
+.settings-action-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .setting-block {
   padding: 14px;
 }
@@ -1553,6 +1567,14 @@ button {
   color: var(--text);
   background: rgba(255, 255, 255, 0.08);
   border-radius: 7px;
+}
+
+.browser-hint {
+  flex: 0 0 auto;
+  padding: 0 9px;
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
 }
 
 .browser-page {

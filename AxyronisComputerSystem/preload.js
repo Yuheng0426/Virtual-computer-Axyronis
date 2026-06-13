@@ -11,6 +11,14 @@ contextBridge.exposeInMainWorld("axyronisNative", {
   getSystemInfo: () => ipcRenderer.invoke("system:getInfo"),
   pickFolder: () => ipcRenderer.invoke("fs:pickFolder"),
   pickWallpaper: () => ipcRenderer.invoke("wallpaper:pickImage"),
+  listDesktopFiles: () => ipcRenderer.invoke("desktop:list"),
+  openDesktopFile: path => ipcRenderer.invoke("desktop:open", path),
+  showDesktopFolder: () => ipcRenderer.invoke("desktop:showFolder"),
+  onDesktopDownloadsChanged: callback => {
+    const listener = (_event, payload) => callback(payload);
+    ipcRenderer.on("desktop:downloads-changed", listener);
+    return () => ipcRenderer.removeListener("desktop:downloads-changed", listener);
+  },
   listDir: path => ipcRenderer.invoke("fs:listDir", path),
   openPath: path => ipcRenderer.invoke("fs:openPath", path),
   openExternal: url => ipcRenderer.invoke("shell:openExternal", url),

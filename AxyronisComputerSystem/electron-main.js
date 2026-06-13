@@ -4,7 +4,7 @@
 // carefully scoped IPC handlers for local files, Windows app launching, system
 // information, and terminal execution.
 
-const { app, BrowserWindow, ipcMain, dialog, shell } = require("electron");
+const { app, BrowserWindow, ipcMain, dialog, shell, session } = require("electron");
 const path = require("path");
 const fs = require("fs/promises");
 const fsSync = require("fs");
@@ -73,6 +73,7 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  setupDownloadRouting();
   createWindow();
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
@@ -154,6 +155,20 @@ ipcMain.handle("fs:openPath", async (_event, targetPath) => {
   return true;
 });
 
+ipcMain.handle("desktop:list", async () => listVirtualDesktop());
+
+ipcMain.handle("desktop:open", async (_event, targetPath) => {
+  if (!isInsideVirtualDesktop(targetPath)) return false;
+  await shell.openPath(targetPath);
+  return true;
+});
+
+ipcMain.handle("desktop:showFolder", async () => {
+  const desktopPath = ensureVirtualDesktop();
+  await shell.openPath(desktopPath);
+  return desktopPath;
+});
+
 ipcMain.handle("shell:openExternal", async (_event, url) => {
   if (!/^https?:\/\//i.test(url)) return false;
   await shell.openExternal(url);
@@ -201,6 +216,99 @@ ipcMain.handle("terminal:run", async (_event, command) => {
     });
   });
 });
+
+function setupDownloadRouting() {
+  // Browser and webview downloads are routed into the Axyronis desktop folder.
+  // The renderer receives status events and refreshes virtual desktop icons.
+  session.defaultSession.on("will-download", (_event, item) => {
+    const desktopPath = ensureVirtualDesktop();
+    const fileName = uniqueDesktopFileName(sanitizeFileName(item.getFilename() || "download.bin"));
+    const savePath = path.join(desktopPath, fileName);
+    item.setSavePath(savePath);
+    sendDesktopDownloadEvent({
+      status: "started",
+      fileName,
+      path: savePath,
+      receivedBytes: 0,
+      totalBytes: item.getTotalBytes()
+    });
+
+    item.on("updated", (_downloadEvent, state) => {
+      sendDesktopDownloadEvent({
+        status: state,
+        fileName,
+        path: savePath,
+        receivedBytes: item.getReceivedBytes(),
+        totalBytes: item.getTotalBytes()
+      });
+    });
+
+    item.once("done", (_downloadEvent, state) => {
+      sendDesktopDownloadEvent({
+        status: state === "completed" ? "completed" : "interrupted",
+        fileName,
+        path: savePath,
+        receivedBytes: item.getReceivedBytes(),
+        totalBytes: item.getTotalBytes()
+      });
+    });
+  });
+}
+
+function ensureVirtualDesktop() {
+  const desktopPath = path.join(app.getPath("userData"), "Axyronis Desktop");
+  fsSync.mkdirSync(desktopPath, { recursive: true });
+  return desktopPath;
+}
+
+async function listVirtualDesktop() {
+  const desktopPath = ensureVirtualDesktop();
+  const entries = await fs.readdir(desktopPath, { withFileTypes: true });
+  const items = await Promise.all(
+    entries.map(async entry => {
+      const fullPath = path.join(desktopPath, entry.name);
+      const stat = await fs.stat(fullPath);
+      return {
+        name: entry.name,
+        path: fullPath,
+        type: entry.isDirectory() ? "folder" : "file",
+        size: stat.size,
+        modified: stat.mtime.toISOString()
+      };
+    })
+  );
+  items.sort((a, b) => new Date(b.modified) - new Date(a.modified));
+  return { path: desktopPath, parent: null, items };
+}
+
+function isInsideVirtualDesktop(targetPath) {
+  if (!targetPath) return false;
+  const desktopPath = ensureVirtualDesktop();
+  const relative = path.relative(desktopPath, path.resolve(targetPath));
+  return relative && !relative.startsWith("..") && !path.isAbsolute(relative);
+}
+
+function sanitizeFileName(fileName) {
+  const cleaned = String(fileName).replace(/[<>:"/\\|?*\x00-\x1F]/g, "_").trim();
+  return cleaned || "download.bin";
+}
+
+function uniqueDesktopFileName(fileName) {
+  const desktopPath = ensureVirtualDesktop();
+  const parsed = path.parse(fileName);
+  let candidate = fileName;
+  let index = 1;
+  while (fsSync.existsSync(path.join(desktopPath, candidate))) {
+    candidate = `${parsed.name} (${index})${parsed.ext}`;
+    index += 1;
+  }
+  return candidate;
+}
+
+function sendDesktopDownloadEvent(payload) {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  mainWindow.webContents.send("desktop:downloads-changed", payload);
+}
 
 function resolveAppCommand(item) {
   if (process.platform === "win32" && item.paths) {

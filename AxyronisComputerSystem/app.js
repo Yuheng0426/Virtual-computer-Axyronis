@@ -177,6 +177,7 @@ const state = {
   settingsCategory: "home",
   settingsPage: "home",
   fileLocation: "Desktop",
+  desktopFiles: [],
   accent: preferences.accent,
   lightMode: preferences.lightMode
 };
@@ -299,6 +300,16 @@ const locales = {
       "settings.displayLanguage": "Display Language",
       "settings.languageNote": "Language changes apply instantly to the shell, Settings, Start menu, desktop icons, and taskbar.",
       "settings.freedomNote": "You may rename the system, replace the brand, reorganize files, rewrite the UI, add native APIs, or turn Axyronis into a completely different educational computer system. Keep safety notes visible when exposing native power.",
+      "settings.guideTitle": "What this page controls",
+      "settings.guideHome": "Use the left rail for major areas, the large cards for common tasks, and each detail page for the actual controls.",
+      "settings.quickActions": "Quick actions",
+      "settings.openDownloads": "Open Axyronis Desktop",
+      "files.axyronisDesktop": "Axyronis Desktop",
+      "files.downloadHint": "Browser downloads appear here and on the desktop.",
+      "browser.downloadHint": "Downloads save to Axyronis Desktop",
+      "toast.downloadStarted": "Download started",
+      "toast.downloadCompleted": "Saved to Axyronis Desktop",
+      "toast.downloadInterrupted": "Download interrupted",
       "toast.preferencesReset": "Preferences reset",
       "toast.languageApplied": "Language applied"
     }
@@ -417,6 +428,16 @@ const locales = {
       "settings.displayLanguage": "显示语言",
       "settings.languageNote": "语言会立即应用到桌面外壳、设置、开始菜单、桌面图标和任务栏。",
       "settings.freedomNote": "你可以重命名系统、替换品牌、重组文件、重写界面、添加原生 API，或把 Axyronis 改造成完全不同的教育电脑系统。开放原生能力时请保留安全说明。",
+      "settings.guideTitle": "这个页面控制什么",
+      "settings.guideHome": "左侧是主要分类，大卡片是常用任务，进入详情页后才是具体开关和选项。",
+      "settings.quickActions": "快捷操作",
+      "settings.openDownloads": "打开 Axyronis 桌面",
+      "files.axyronisDesktop": "Axyronis 桌面",
+      "files.downloadHint": "浏览器下载会出现在这里，也会显示在桌面上。",
+      "browser.downloadHint": "下载会保存到 Axyronis 桌面",
+      "toast.downloadStarted": "下载已开始",
+      "toast.downloadCompleted": "已保存到 Axyronis 桌面",
+      "toast.downloadInterrupted": "下载中断",
       "toast.preferencesReset": "偏好设置已重置",
       "toast.languageApplied": "语言已应用"
     }
@@ -499,6 +520,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderDesktopIcons();
   renderStartMenu();
   wireGlobalEvents();
+  loadDesktopFiles();
   updateClock();
   setInterval(updateClock, 1000);
 });
@@ -628,6 +650,14 @@ function wireGlobalEvents() {
   $("#commandPalette").addEventListener("click", event => {
     if (event.target.id === "commandPalette") closeCommandPalette();
   });
+  if (nativeAPI?.onDesktopDownloadsChanged) {
+    nativeAPI.onDesktopDownloadsChanged(payload => {
+      if (payload.status === "started") showToast(`${t("toast.downloadStarted")}: ${payload.fileName}`);
+      if (payload.status === "completed") showToast(`${t("toast.downloadCompleted")}: ${payload.fileName}`);
+      if (payload.status === "interrupted") showToast(`${t("toast.downloadInterrupted")}: ${payload.fileName}`, "error");
+      loadDesktopFiles();
+    });
+  }
   $$(".quick-toggle").forEach(toggle => {
     toggle.addEventListener("click", () => toggle.classList.toggle("active"));
   });
@@ -723,6 +753,26 @@ function updateOpenWindowTitles() {
   });
 }
 
+async function loadDesktopFiles() {
+  if (!nativeAPI?.listDesktopFiles) return;
+  try {
+    const result = await nativeAPI.listDesktopFiles();
+    state.desktopFiles = result.items || [];
+    renderDesktopIcons();
+    refreshOpenFilesPanels();
+  } catch {
+    state.desktopFiles = [];
+  }
+}
+
+function refreshOpenFilesPanels() {
+  const entry = state.windows.get("files");
+  if (!entry) return;
+  const body = $(".window-body", entry.el);
+  body.innerHTML = "";
+  body.append(renderFiles());
+}
+
 function renderDesktopIcons() {
   const desktop = $("#desktopIcons");
   desktop.innerHTML = "";
@@ -733,6 +783,14 @@ function renderDesktopIcons() {
     button.innerHTML = `<span class="icon-tile">${app.symbol}</span><span>${appDisplayName(app)}</span>`;
     button.addEventListener("dblclick", () => openApp(app.id));
     desktop.append(button);
+  });
+  state.desktopFiles.slice(0, 18).forEach(item => {
+    const fileButton = document.createElement("button");
+    fileButton.className = "desktop-icon desktop-file";
+    fileButton.title = item.path;
+    fileButton.innerHTML = `<span class="icon-tile">${fileIconSymbol(item)}</span><span>${escapeHtml(item.name)}</span>`;
+    fileButton.addEventListener("dblclick", () => nativeAPI.openDesktopFile(item.path));
+    desktop.append(fileButton);
   });
 }
 
@@ -1174,8 +1232,9 @@ function renderNativeFiles() {
   // and open paths, so Node.js APIs stay outside the UI layer.
   const root = div("app-layout native-files");
   const toolbar = div("toolbar");
+  const desktop = button(t("files.axyronisDesktop"), "text-button primary");
   const up = button("Up", "text-button");
-  const choose = button("Choose Folder", "text-button primary");
+  const choose = button("Choose Folder", "text-button");
   const open = button("Open Selected", "text-button");
   const status = document.createElement("span");
   status.textContent = "Reading local files...";
@@ -1186,7 +1245,7 @@ function renderNativeFiles() {
   let parentPath = "";
   let selectedPath = "";
 
-  toolbar.append(up, choose, open, status);
+  toolbar.append(desktop, up, choose, open, status);
   root.append(toolbar, pathLine, grid, preview);
 
   const load = async targetPath => {
@@ -1203,7 +1262,7 @@ function renderNativeFiles() {
         const tile = document.createElement("button");
         tile.className = "file-item";
         tile.innerHTML = `
-          <span class="icon-tile">${item.type === "folder" ? "D" : "F"}</span>
+          <span class="icon-tile">${fileIconSymbol(item)}</span>
           <strong>${escapeHtml(item.name)}</strong>
           <small>${formatFileMeta(item)}</small>
         `;
@@ -1223,6 +1282,40 @@ function renderNativeFiles() {
     }
   };
 
+  const loadAxyronisDesktop = async () => {
+    grid.innerHTML = "";
+    preview.textContent = t("files.downloadHint");
+    status.textContent = "Loading...";
+    try {
+      const result = await nativeAPI.listDesktopFiles();
+      currentPath = result.path;
+      parentPath = "";
+      pathLine.textContent = `${t("files.axyronisDesktop")} - ${result.path}`;
+      status.textContent = `${result.items.length} items`;
+      state.desktopFiles = result.items || [];
+      result.items.forEach(item => {
+        const tile = document.createElement("button");
+        tile.className = "file-item";
+        tile.innerHTML = `
+          <span class="icon-tile">${fileIconSymbol(item)}</span>
+          <strong>${escapeHtml(item.name)}</strong>
+          <small>${formatFileMeta(item)}</small>
+        `;
+        tile.addEventListener("click", () => {
+          selectedPath = item.path;
+          preview.innerHTML = `<strong>${escapeHtml(item.name)}</strong><p>${escapeHtml(item.path)}</p><p>${formatFileMeta(item)}</p>`;
+        });
+        tile.addEventListener("dblclick", () => nativeAPI.openDesktopFile(item.path));
+        grid.append(tile);
+      });
+      renderDesktopIcons();
+    } catch (error) {
+      status.textContent = "Load failed";
+      preview.textContent = error.message || String(error);
+    }
+  };
+
+  desktop.addEventListener("click", loadAxyronisDesktop);
   up.addEventListener("click", () => parentPath && load(parentPath));
   choose.addEventListener("click", async () => {
     const picked = await nativeAPI.pickFolder();
@@ -1232,7 +1325,7 @@ function renderNativeFiles() {
     if (selectedPath) nativeAPI.openPath(selectedPath);
   });
 
-  load();
+  loadAxyronisDesktop();
   return root;
 }
 
@@ -1287,6 +1380,9 @@ function renderNativeBrowser() {
   const input = document.createElement("input");
   const go = button("Go", "text-button primary");
   const external = button("Open External", "text-button");
+  const downloadHint = document.createElement("span");
+  downloadHint.className = "browser-hint";
+  downloadHint.textContent = t("browser.downloadHint");
   const webview = document.createElement("webview");
   webview.className = "webview";
   webview.setAttribute("allowpopups", "");
@@ -1314,7 +1410,7 @@ function renderNativeBrowser() {
     input.value = event.url;
   });
 
-  bar.append(back, forward, reload, input, go, external);
+  bar.append(back, forward, reload, input, go, external, downloadHint);
   root.append(bar, webview);
   return root;
 }
@@ -1332,6 +1428,9 @@ function renderChromeBrowser() {
   const home = button("Home", "text-button");
   const input = document.createElement("input");
   const go = button("Go", "text-button primary");
+  const downloadHint = document.createElement("span");
+  downloadHint.className = "browser-hint";
+  downloadHint.textContent = t("browser.downloadHint");
   const webview = document.createElement("webview");
   webview.className = "webview";
   webview.setAttribute("allowpopups", "");
@@ -1362,7 +1461,7 @@ function renderChromeBrowser() {
     input.value = event.url;
   });
 
-  bar.append(back, forward, reload, home, input, go);
+  bar.append(back, forward, reload, home, input, go, downloadHint);
   root.append(bar, webview);
   return root;
 }
@@ -1749,6 +1848,20 @@ function renderSettings() {
     const homeGrid = div("settings-home-grid");
     homeGrid.append(recommended, storage);
 
+    const guide = div("setting-block settings-stack settings-guide-card");
+    guide.innerHTML = `<h3>${t("settings.guideTitle")}</h3><p>${t("settings.guideHome")}</p>`;
+    const actions = div("settings-action-strip");
+    [
+      [t("settings.language"), () => route("time", "language")],
+      [t("settings.wallpaper"), () => route("personalization", "wallpaper")],
+      [t("settings.openDownloads"), () => openApp("files")]
+    ].forEach(([label, action]) => {
+      const actionButton = button(label, "text-button primary");
+      actionButton.addEventListener("click", action);
+      actions.append(actionButton);
+    });
+    guide.append(actions);
+
     const categoryGrid = div("settings-category-grid");
     categories.filter(category => category.id !== "home").forEach(category => {
       const card = document.createElement("button");
@@ -1758,7 +1871,7 @@ function renderSettings() {
       categoryGrid.append(card);
     });
 
-    panel.append(settingsHeader(t("settings.home"), t("settings.recommendedDesc")), hero, homeGrid, categoryGrid);
+    panel.append(settingsHeader(t("settings.home"), t("settings.recommendedDesc")), hero, homeGrid, guide, categoryGrid);
   };
 
   const drawCategory = categoryId => {
@@ -2176,6 +2289,17 @@ function formatBytes(bytes) {
     index += 1;
   }
   return `${size.toFixed(size >= 10 ? 1 : 2)} ${units[index]}`;
+}
+
+function fileIconSymbol(item) {
+  if (item.type === "folder") return "D";
+  const ext = String(item.name || "").split(".").pop().toLowerCase();
+  if (["png", "jpg", "jpeg", "gif", "webp", "bmp", "svg"].includes(ext)) return "I";
+  if (["zip", "rar", "7z", "tar", "gz"].includes(ext)) return "Z";
+  if (["exe", "msi", "bat", "cmd"].includes(ext)) return "X";
+  if (["pdf"].includes(ext)) return "P";
+  if (["mp4", "mov", "webm", "mp3", "wav"].includes(ext)) return "M";
+  return "F";
 }
 
 function formatFileMeta(item) {

@@ -125,12 +125,28 @@ app.js -> preload.js -> electron-main.js -> wallpaper:pickImage
 
 Browser mode can preview a selected image for the current session with a blob URL. It does not persist the file after reload.
 
+## Browser Download System
+
+Electron download routing lives in `electron-main.js`.
+
+```text
+webview download -> session.defaultSession will-download -> Axyronis Desktop
+```
+
+Downloads are saved inside Electron user data:
+
+```text
+app.getPath("userData")/Axyronis Desktop
+```
+
+The renderer does not choose arbitrary save paths. It receives download status through `desktop:downloads-changed`, refreshes desktop file icons, and lets users open downloaded files through the scoped `desktop:open` handler.
+
 ## Versioning
 
 The repository uses Git tags for downloadable versions.
 
 ```text
 v1.0.0   Settings wallpaper and identity release
-v1.1.0   Next feature update
-v1.2.0   Later feature update
+v1.1.0   Usability and browser download release
+v1.2.0   Next feature update
 ```
