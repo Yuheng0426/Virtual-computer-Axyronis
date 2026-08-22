@@ -45,8 +45,8 @@ The Settings app includes an Identity section so users can rename the system, de
 - Nebula Browser with a real Electron `webview`.
 - Local file browser in desktop mode.
 - Axyron Terminal with built-in commands and native command execution.
-- Command Palette, available from the `CMD` taskbar button or `Ctrl + K`.
-- Quick Center, available from the `QC` taskbar button or `Ctrl + Q`.
+- Command Palette, available from the `SEARCH` taskbar button or `Ctrl + K`.
+- Quick Center, available from the `CTRL` taskbar button or `Ctrl + Q`.
 - One-click Power Workspace layout from the Command Palette.
 - Advanced Settings app with Identity, Appearance, Desktop, Startup, and Developer sections.
 - Axyronis layered Settings control center with Home, category pages, and detail pages.
