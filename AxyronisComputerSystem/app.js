@@ -192,6 +192,10 @@ const state = {
   chromeUrl: "https://www.google.com/?hl=en",
   managerScore: 94,
   managerLastScan: "Ready",
+  notifications: [],
+  taskViewOpen: false,
+  notificationCenterOpen: false,
+  snapCycle: new Map(),
   accent: preferences.accent,
   lightMode: preferences.lightMode
 };
@@ -585,6 +589,8 @@ document.addEventListener("DOMContentLoaded", () => {
   renderStartMenu();
   wireGlobalEvents();
   loadDesktopFiles();
+  updateHealthWidget();
+  renderNotifications();
   updateClock();
   setInterval(updateClock, 1000);
 });
@@ -596,6 +602,8 @@ function boot() {
     $("#boot").classList.add("is-hidden");
     $("#os").classList.remove("is-hidden");
     runStartupMode();
+    restoreSession();
+    pushNotification("Axyronis 2.0 is ready", "Task View, Snap Assist, widgets, and session restore are online.");
   }, 1700);
 }
 
@@ -692,6 +700,10 @@ function wireGlobalEvents() {
       if (action === "refresh-desktop") refreshDesktop();
       if (action === "toggle-quick-center") toggleQuickCenter();
       if (action === "open-command-palette") openCommandPalette();
+      if (action === "toggle-task-view") toggleTaskView();
+      if (action === "toggle-notifications") toggleNotificationCenter();
+      if (action === "clear-notifications") clearNotifications();
+      if (action === "new-workspace") openPowerWorkspace();
     }
 
     if (!event.target.closest(".start-menu") && !event.target.closest("#startButton")) {
@@ -702,6 +714,9 @@ function wireGlobalEvents() {
     }
     if (!event.target.closest(".quick-center") && !event.target.closest("[data-action='toggle-quick-center']")) {
       closeQuickCenter();
+    }
+    if (!event.target.closest(".notification-center") && !event.target.closest("[data-action='toggle-notifications']") && !event.target.closest(".widget-clock")) {
+      closeNotificationCenter();
     }
   });
 
@@ -755,6 +770,8 @@ function wireGlobalEvents() {
       closeDesktopMenu();
       closeQuickCenter();
       closeCommandPalette();
+      closeTaskView();
+      closeNotificationCenter();
     }
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
       event.preventDefault();
@@ -763,6 +780,22 @@ function wireGlobalEvents() {
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "q") {
       event.preventDefault();
       toggleQuickCenter();
+    }
+    if ((event.metaKey && event.key === "Tab") || ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === "e")) {
+      event.preventDefault();
+      toggleTaskView();
+    }
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "n") {
+      event.preventDefault();
+      toggleNotificationCenter();
+    }
+    if (event.altKey && event.key === "Tab") {
+      event.preventDefault();
+      cycleWindows();
+    }
+    if (event.metaKey && ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) {
+      event.preventDefault();
+      snapActiveWindow(event.key.replace("Arrow", "").toLowerCase());
     }
   });
 }
@@ -774,6 +807,10 @@ function updateClock() {
   $("#trayTime").textContent = time;
   $("#trayDate").textContent = date;
   $("#desktopClock").textContent = time;
+  $("#widgetTime").textContent = time;
+  $("#widgetDate").textContent = now.toLocaleDateString(preferences.language, { weekday: "long", month: "short", day: "numeric" });
+  $("#calendarMonth").textContent = now.toLocaleDateString(preferences.language, { month: "long", year: "numeric" });
+  renderCalendar(now);
 }
 
 function localizeShell() {
@@ -796,13 +833,13 @@ function localizeShell() {
   };
   $$("[data-open-app]").forEach(item => {
     const label = menuLabels[item.dataset.openApp] || t(`app.${item.dataset.openApp}.name`);
-    if (label && !item.classList.contains("desktop-icon") && !item.classList.contains("tray-button") && !item.classList.contains("app-card")) {
+    if (label && !item.classList.contains("desktop-icon") && !item.classList.contains("tray-button") && !item.classList.contains("app-card") && !item.classList.contains("widget")) {
       item.textContent = label;
     }
   });
 
   $$("[data-action='open-command-palette']").forEach(item => {
-    item.textContent = item.classList.contains("tray-button") ? "CMD" : t("shell.commandPalette");
+    item.textContent = item.classList.contains("tray-button") ? "SEARCH" : t("shell.commandPalette");
     item.title = t("shell.commandPalette");
   });
   const settingsTray = $("[data-open-app='settings'].tray-button");
@@ -1000,6 +1037,21 @@ function getCommands() {
       run: toggleQuickCenter
     },
     {
+      title: "Open Task View",
+      detail: "Switch between windows and arrange the workspace",
+      run: toggleTaskView
+    },
+    {
+      title: "Open Notification Center",
+      detail: "Review system activity and calendar",
+      run: toggleNotificationCenter
+    },
+    {
+      title: "Snap Active Window Left",
+      detail: "Tile the focused window to the left half",
+      run: () => snapActiveWindow("left")
+    },
+    {
       title: "Open Wallpaper Settings",
       detail: "Change desktop wallpaper and presets",
       run: () => openSettingsSection("wallpaper")
@@ -1045,6 +1097,8 @@ function runManagerScan() {
   state.managerScore = clamp(Math.round(90 + Math.random() * 8), 90, 99);
   state.managerLastScan = new Date().toLocaleTimeString(preferences.language, { hour: "2-digit", minute: "2-digit" });
   refreshOpenManagerPanel();
+  updateHealthWidget();
+  pushNotification("Health scan complete", `Workspace health is ${state.managerScore}%.`, "system");
   showToast(`${t("manager.scanComplete")}: ${state.managerScore}%`);
 }
 
@@ -1173,6 +1227,92 @@ function showToast(message, type = "ok") {
   }, 3200);
 }
 
+function pushNotification(title, detail, type = "system") {
+  state.notifications.unshift({ id: Date.now() + Math.random(), title, detail, type, time: new Date() });
+  state.notifications = state.notifications.slice(0, 20);
+  renderNotifications();
+}
+
+function renderNotifications() {
+  const list = $("#notificationList");
+  const badge = $("#notificationBadge");
+  if (!list || !badge) return;
+  badge.textContent = String(state.notifications.length);
+  badge.classList.toggle("empty", state.notifications.length === 0);
+  list.innerHTML = state.notifications.length ? "" : '<div class="notification-empty"><strong>You are all caught up</strong><span>New system activity will appear here.</span></div>';
+  state.notifications.forEach(item => {
+    const card = document.createElement("article");
+    card.className = "notification-card";
+    card.innerHTML = `<span class="notification-mark">${item.type === "error" ? "!" : "A"}</span><div><strong>${escapeHtml(item.title)}</strong><p>${escapeHtml(item.detail)}</p><small>${item.time.toLocaleTimeString(preferences.language, { hour: "2-digit", minute: "2-digit" })}</small></div>`;
+    list.append(card);
+  });
+}
+
+function toggleNotificationCenter() {
+  closeStart();
+  closeQuickCenter();
+  closeTaskView();
+  state.notificationCenterOpen = !state.notificationCenterOpen;
+  $("#notificationCenter").classList.toggle("open", state.notificationCenterOpen);
+  $("#notificationCenter").setAttribute("aria-hidden", String(!state.notificationCenterOpen));
+  renderNotifications();
+}
+
+function closeNotificationCenter() {
+  state.notificationCenterOpen = false;
+  $("#notificationCenter")?.classList.remove("open");
+  $("#notificationCenter")?.setAttribute("aria-hidden", "true");
+}
+
+function clearNotifications() {
+  state.notifications = [];
+  renderNotifications();
+}
+
+function toggleTaskView() {
+  closeStart();
+  closeQuickCenter();
+  closeNotificationCenter();
+  state.taskViewOpen = !state.taskViewOpen;
+  $("#taskView").classList.toggle("open", state.taskViewOpen);
+  $("#taskView").setAttribute("aria-hidden", String(!state.taskViewOpen));
+  renderTaskView();
+}
+
+function closeTaskView() {
+  state.taskViewOpen = false;
+  $("#taskView")?.classList.remove("open");
+  $("#taskView")?.setAttribute("aria-hidden", "true");
+}
+
+function renderTaskView() {
+  const grid = $("#taskViewGrid");
+  if (!grid) return;
+  grid.innerHTML = state.windows.size ? "" : '<div class="task-view-empty"><strong>No open windows</strong><span>Open an app from Start to begin.</span></div>';
+  state.windows.forEach((entry, id) => {
+    const card = document.createElement("button");
+    card.className = `task-card ${state.active === id ? "active" : ""}`;
+    card.innerHTML = `<span class="task-preview"><b>${entry.app.symbol}</b><i>${entry.maximized ? "MAXIMIZED" : entry.minimized ? "MINIMIZED" : "RUNNING"}</i></span><strong>${escapeHtml(appDisplayName(entry.app))}</strong>`;
+    card.addEventListener("click", () => {
+      entry.el.classList.remove("is-hidden");
+      entry.minimized = false;
+      activateWindow(id);
+      closeTaskView();
+    });
+    grid.append(card);
+  });
+}
+
+function renderCalendar(now) {
+  const row = $("#calendarDays");
+  if (!row) return;
+  row.innerHTML = Array.from({ length: 7 }, (_, offset) => {
+    const day = new Date(now);
+    day.setDate(now.getDate() - 3 + offset);
+    return `<span class="${offset === 3 ? "today" : ""}"><small>${day.toLocaleDateString(preferences.language, { weekday: "narrow" })}</small><b>${day.getDate()}</b></span>`;
+  }).join("");
+}
+
 function openApp(id) {
   const app = appById(id);
   if (!app) return;
@@ -1221,6 +1361,7 @@ function openWindowApp(app) {
   wireWindow(template, id);
   activateWindow(id);
   renderTaskbar();
+  saveSession();
 }
 
 function wireWindow(win, id) {
@@ -1233,6 +1374,7 @@ function wireWindow(win, id) {
     if (action === "close") closeWindow(id);
     if (action === "minimize") minimizeWindow(id);
     if (action === "maximize") toggleMaximize(id);
+    if (action === "snap") cycleSnap(id);
   });
   makeDraggable(win, $(".window-titlebar", win));
 }
@@ -1259,8 +1401,12 @@ function makeDraggable(win, handle) {
     win.style.top = `${nextTop}px`;
   });
 
-  handle.addEventListener("pointerup", () => {
+  handle.addEventListener("pointerup", event => {
+    if (drag && event.clientX <= 8) snapWindow(win.dataset.app, "left");
+    else if (drag && event.clientX >= window.innerWidth - 8) snapWindow(win.dataset.app, "right");
+    else if (drag && event.clientY <= 8) toggleMaximize(win.dataset.app);
     drag = null;
+    saveSession();
   });
 }
 
@@ -1272,6 +1418,7 @@ function activateWindow(id) {
   $$(".app-window").forEach(win => win.classList.toggle("focused", win === entry.el));
   renderTaskbar();
   updateDockMode();
+  renderTaskView();
 }
 
 function closeWindow(id) {
@@ -1282,6 +1429,8 @@ function closeWindow(id) {
   if (state.active === id) state.active = null;
   renderTaskbar();
   updateDockMode();
+  saveSession();
+  renderTaskView();
 }
 
 function minimizeWindow(id) {
@@ -1291,6 +1440,8 @@ function minimizeWindow(id) {
   entry.minimized = true;
   renderTaskbar();
   updateDockMode();
+  saveSession();
+  renderTaskView();
 }
 
 function toggleMaximize(id) {
@@ -1308,10 +1459,113 @@ function toggleMaximize(id) {
       width: el.style.width,
       height: el.style.height
     };
+    el.classList.remove("snapped");
     el.classList.add("maximized");
     entry.maximized = true;
   }
   activateWindow(id);
+  saveSession();
+}
+
+function cycleSnap(id) {
+  const layouts = ["left", "right", "top-left", "top-right", "bottom-left", "bottom-right"];
+  const current = state.snapCycle.get(id) || 0;
+  snapWindow(id, layouts[current % layouts.length]);
+  state.snapCycle.set(id, current + 1);
+}
+
+function snapActiveWindow(position) {
+  if (!state.active) {
+    showToast("Open or focus a window first.", "error");
+    return;
+  }
+  if (position === "up") {
+    toggleMaximize(state.active);
+    return;
+  }
+  if (position === "down") {
+    minimizeWindow(state.active);
+    return;
+  }
+  snapWindow(state.active, position);
+}
+
+function snapWindow(id, position) {
+  const entry = state.windows.get(id);
+  if (!entry) return;
+  const el = entry.el;
+  const gap = 12;
+  const dock = 78;
+  const fullWidth = window.innerWidth - gap * 3;
+  const fullHeight = window.innerHeight - dock - gap * 2;
+  const halfWidth = Math.floor(fullWidth / 2);
+  const halfHeight = Math.floor(fullHeight / 2);
+  const map = {
+    left: [gap, gap, halfWidth, fullHeight],
+    right: [gap * 2 + halfWidth, gap, halfWidth, fullHeight],
+    "top-left": [gap, gap, halfWidth, halfHeight],
+    "top-right": [gap * 2 + halfWidth, gap, halfWidth, halfHeight],
+    "bottom-left": [gap, gap * 2 + halfHeight, halfWidth, halfHeight],
+    "bottom-right": [gap * 2 + halfWidth, gap * 2 + halfHeight, halfWidth, halfHeight]
+  };
+  const bounds = map[position];
+  if (!bounds) return;
+  el.classList.remove("maximized", "is-hidden");
+  el.classList.add("snapped");
+  Object.assign(el.style, {
+    left: `${bounds[0]}px`, top: `${bounds[1]}px`, width: `${bounds[2]}px`, height: `${bounds[3]}px`
+  });
+  entry.maximized = false;
+  entry.minimized = false;
+  activateWindow(id);
+  showToast(`${appDisplayName(entry.app)} snapped ${position.replace("-", " ")}.`);
+  saveSession();
+}
+
+function cycleWindows() {
+  const visible = Array.from(state.windows.entries()).filter(([, entry]) => !entry.el.classList.contains("is-hidden"));
+  if (!visible.length) return;
+  const index = visible.findIndex(([id]) => id === state.active);
+  const [nextId] = visible[(index + 1) % visible.length];
+  activateWindow(nextId);
+}
+
+function saveSession() {
+  const session = Array.from(state.windows.entries()).map(([id, entry]) => ({
+    id,
+    minimized: entry.minimized,
+    maximized: entry.maximized,
+    left: entry.el.style.left,
+    top: entry.el.style.top,
+    width: entry.el.style.width,
+    height: entry.el.style.height
+  }));
+  localStorage.setItem("axyronis-session-v2", JSON.stringify(session));
+}
+
+function restoreSession() {
+  if (preferences.startupMode !== "clean") return;
+  let session = [];
+  try {
+    session = JSON.parse(localStorage.getItem("axyronis-session-v2") || "[]");
+  } catch {
+    session = [];
+  }
+  session.slice(0, 8).forEach(saved => {
+    if (!appById(saved.id)) return;
+    openApp(saved.id);
+    const entry = state.windows.get(saved.id);
+    if (!entry) return;
+    Object.assign(entry.el.style, { left: saved.left, top: saved.top, width: saved.width, height: saved.height });
+    if (saved.maximized) toggleMaximize(saved.id);
+    if (saved.minimized) minimizeWindow(saved.id);
+  });
+}
+
+function updateHealthWidget() {
+  const value = clamp(state.managerScore, 0, 100);
+  if ($("#widgetHealth")) $("#widgetHealth").textContent = String(value);
+  if ($("#widgetHealthBar")) $("#widgetHealthBar").style.width = `${value}%`;
 }
 
 function updateDockMode() {

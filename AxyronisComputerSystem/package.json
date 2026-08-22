@@ -1,7 +1,7 @@
 {
   "name": "axyronis-computer-system",
-  "version": "1.1.1",
-  "description": "Axyronis personal virtual computer system",
+  "version": "2.0.0",
+  "description": "A fast Windows-inspired virtual desktop with native app bridges, Snap Assist, Task View, widgets, and system tools",
   "main": "electron-main.js",
   "private": true,
   "author": "Yuheng0426",

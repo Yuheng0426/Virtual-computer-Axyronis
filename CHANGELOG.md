@@ -2,6 +2,19 @@
 
 This project uses Git tags so learners can download different versions over time.
 
+## v2.0.0 - Workspace Evolution Release
+
+- Added a Windows-style Task View with live running, minimized, maximized, and focused app states.
+- Added Snap Assist for left, right, and four quadrant layouts.
+- Added edge snapping and keyboard window control with `Win + Arrow`.
+- Added fast window switching with `Alt + Tab` and Task View shortcuts.
+- Added a Notification Center with activity history, unread badge, clear action, and calendar strip.
+- Added desktop clock and workspace-health widgets.
+- Added automatic session restore for open apps and window geometry.
+- Redesigned the taskbar around Search, View, Notifications, and Control Center.
+- Added responsive behavior for the new shell surfaces and preserved Electron context isolation.
+- Updated package metadata to `2.0.0`.
+
 ## v1.1.1 - Axyronis Manager Release
 
 - Added Axyronis Manager as a system-level care center for performance, privacy, storage, downloads, web apps, and native power.
@@ -44,9 +57,4 @@ This project uses Git tags so learners can download different versions over time
 
 ## Future Versions
 
-Future updates will use the same pattern:
-
-- `v1.1.0` for the usability and browser download update.
-- `v1.1.1` for the Axyronis Manager system-care update.
-- `v1.1.2` for the next feature update.
-- Patch versions such as `v1.0.1` for small fixes.
+Feature releases continue from `v2.x`; patch versions such as `v2.0.1` are reserved for focused fixes.

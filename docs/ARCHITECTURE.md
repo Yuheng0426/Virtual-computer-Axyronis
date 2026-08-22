@@ -101,6 +101,18 @@ home -> category -> detail page
 
 Display language strings live in the `locales` object inside `app.js`. Add a new locale by copying the English strings, changing `name`, and translating the `strings` values. The `t("key")` helper falls back to English when a translation is missing.
 
+## Workspace Shell
+
+The v2 shell extends the existing window registry instead of creating a second window model:
+
+```text
+state.windows -> Task View -> taskbar -> session restore
+              -> Snap Assist -> half and quadrant bounds
+state.notifications -> Notification Center -> unread badge
+```
+
+`snapWindow()` owns window tiling, `renderTaskView()` mirrors running apps, and `saveSession()` persists window geometry under `axyronis-session-v2`. Global shortcuts route through the same public window functions used by buttons, so mouse and keyboard behavior stay consistent.
+
 For a major remix, start by changing `defaultPreferences`, the `apps` array, and the design tokens in `styles.css`.
 
 ## Manager System

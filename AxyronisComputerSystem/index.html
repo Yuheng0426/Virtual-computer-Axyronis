@@ -33,6 +33,17 @@
           </div>
         </div>
         <div id="desktopIcons" class="desktop-icons"></div>
+        <aside class="desktop-widgets" aria-label="Desktop widgets">
+          <button class="widget widget-clock" data-action="toggle-notifications" title="Open notification center">
+            <span id="widgetDate">Today</span>
+            <strong id="widgetTime">--:--</strong>
+          </button>
+          <button class="widget widget-performance" data-open-app="system" title="Open System Monitor">
+            <span>Workspace health</span>
+            <strong><b id="widgetHealth">94</b>%</strong>
+            <i><em id="widgetHealthBar"></em></i>
+          </button>
+        </aside>
         <div id="windowLayer" class="window-layer"></div>
       </section>
 
@@ -106,6 +117,30 @@
         </div>
       </div>
 
+      <section id="taskView" class="task-view" aria-label="Task view" aria-hidden="true">
+        <header>
+          <div><span>WORKSPACES</span><strong>Task View</strong></div>
+          <button class="icon-button" data-action="toggle-task-view" title="Close task view">X</button>
+        </header>
+        <div id="taskViewGrid" class="task-view-grid"></div>
+        <footer>
+          <button class="text-button" data-action="new-workspace">Arrange workspace</button>
+          <span>Win + Tab</span>
+        </footer>
+      </section>
+
+      <aside id="notificationCenter" class="notification-center" aria-label="Notification center" aria-hidden="true">
+        <header>
+          <div><span>ACTIVITY</span><strong>Notifications</strong></div>
+          <button class="icon-button" data-action="clear-notifications" title="Clear notifications">Clear</button>
+        </header>
+        <div id="notificationList" class="notification-list"></div>
+        <section class="calendar-strip">
+          <span id="calendarMonth">This month</span>
+          <div id="calendarDays"></div>
+        </section>
+      </aside>
+
       <div class="dock-reveal-zone" aria-hidden="true"></div>
       <nav class="taskbar" aria-label="Dock">
         <button id="startButton" class="start-button" title="Start">
@@ -113,11 +148,10 @@
         </button>
         <div id="taskbarApps" class="taskbar-apps"></div>
         <div class="system-tray">
-          <button class="tray-button" data-action="open-command-palette" title="Command Palette">CMD</button>
-          <button class="tray-button" data-open-app="manager" title="Axyronis Manager">CARE</button>
-          <button class="tray-button" data-open-app="system" title="System Monitor">CPU</button>
-          <button class="tray-button" data-open-app="settings" title="Settings">SET</button>
-          <button class="tray-button" data-action="toggle-quick-center" title="Quick Center">QC</button>
+          <button class="tray-button" data-action="open-command-palette" title="Search and commands">SEARCH</button>
+          <button class="tray-button" data-action="toggle-task-view" title="Task View">VIEW</button>
+          <button class="tray-button" data-action="toggle-notifications" title="Notifications">BELL<span id="notificationBadge" class="notification-badge">0</span></button>
+          <button class="tray-button" data-action="toggle-quick-center" title="Quick Center">CTRL</button>
           <div class="tray-clock">
             <strong id="trayTime">--:--</strong>
             <span id="trayDate">--/--</span>
@@ -135,6 +169,7 @@
           </div>
           <div class="window-controls">
             <button class="window-button" data-window-action="minimize" title="Minimize">_</button>
+            <button class="window-button" data-window-action="snap" title="Snap window">||</button>
             <button class="window-button" data-window-action="maximize" title="Maximize">[]</button>
             <button class="window-button close" data-window-action="close" title="Close">X</button>
           </div>

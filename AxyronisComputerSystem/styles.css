@@ -274,6 +274,71 @@ button {
   pointer-events: none;
 }
 
+.desktop-widgets {
+  position: absolute;
+  top: 78px;
+  right: 22px;
+  width: 210px;
+  display: grid;
+  gap: 10px;
+  z-index: 2;
+}
+
+.widget {
+  width: 100%;
+  min-height: 92px;
+  display: grid;
+  align-content: center;
+  gap: 4px;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text);
+  background: rgba(8, 11, 18, 0.46);
+  backdrop-filter: blur(22px) saturate(150%);
+  border-radius: var(--radius);
+  box-shadow: var(--soft-shadow);
+  text-align: left;
+  cursor: pointer;
+}
+
+.widget:hover {
+  border-color: rgba(51, 224, 194, 0.48);
+  background: rgba(12, 18, 26, 0.68);
+}
+
+.widget span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.widget-clock strong {
+  font-size: 30px;
+  font-weight: 650;
+}
+
+.widget-performance strong {
+  font-size: 25px;
+}
+
+.widget-performance strong b {
+  font-weight: 700;
+}
+
+.widget-performance i {
+  height: 4px;
+  margin-top: 6px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+}
+
+.widget-performance em {
+  display: block;
+  width: 94%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-3));
+}
+
 .desktop-menu {
   position: fixed;
   min-width: 190px;
@@ -420,6 +485,275 @@ button {
   background: rgba(255, 255, 255, 0.07);
   border-radius: 7px;
   cursor: pointer;
+}
+
+.tray-button {
+  position: relative;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 17px;
+  height: 17px;
+  display: grid;
+  place-items: center;
+  padding: 0 4px;
+  color: #06100f;
+  background: var(--accent-3);
+  border: 2px solid #111620;
+  border-radius: 999px;
+  font-size: 9px;
+}
+
+.notification-badge.empty {
+  display: none;
+}
+
+.task-view {
+  position: fixed;
+  inset: 0;
+  z-index: 15000;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 18px;
+  padding: 42px clamp(22px, 5vw, 74px) 90px;
+  background: rgba(5, 8, 13, 0.72);
+  backdrop-filter: blur(32px) saturate(130%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease;
+}
+
+.task-view.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.task-view header,
+.task-view footer,
+.notification-center header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.task-view header div,
+.notification-center header div {
+  display: grid;
+  gap: 3px;
+}
+
+.task-view header span,
+.notification-center header span {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.task-view header strong,
+.notification-center header strong {
+  font-size: 24px;
+}
+
+.task-view-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-auto-rows: minmax(180px, 1fr);
+  gap: 14px;
+  overflow: auto;
+}
+
+.task-card {
+  min-width: 0;
+  display: grid;
+  grid-template-rows: minmax(120px, 1fr) auto;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.065);
+  border-radius: var(--radius);
+  text-align: left;
+  cursor: pointer;
+}
+
+.task-card:hover,
+.task-card.active {
+  border-color: rgba(51, 224, 194, 0.54);
+  background: rgba(51, 224, 194, 0.12);
+}
+
+.task-preview {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(145deg, rgba(51, 224, 194, 0.1), rgba(255, 95, 162, 0.09)), rgba(5, 9, 14, 0.7);
+  border-radius: 6px;
+}
+
+.task-preview b {
+  font-size: 38px;
+}
+
+.task-preview i {
+  color: var(--muted);
+  font-size: 10px;
+  font-style: normal;
+}
+
+.task-view footer span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.task-view-empty,
+.notification-empty {
+  display: grid;
+  place-content: center;
+  gap: 6px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.notification-center {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  bottom: 76px;
+  width: min(390px, calc(100vw - 24px));
+  z-index: 15001;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(9, 13, 20, 0.88);
+  backdrop-filter: blur(32px) saturate(150%);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  transform: translateX(calc(100% + 24px));
+  opacity: 0;
+  pointer-events: none;
+  transition: 170ms ease;
+}
+
+.notification-center.open {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.notification-list {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  overflow: auto;
+}
+
+.notification-card {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 7px;
+}
+
+.notification-mark {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  color: #06100f;
+  background: var(--accent);
+  border-radius: 7px;
+  font-weight: 900;
+}
+
+.notification-card p {
+  margin: 4px 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.notification-card small {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.calendar-strip {
+  display: grid;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.calendar-strip > span {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.calendar-strip > div {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-strip > div span {
+  min-height: 48px;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 3px;
+  border-radius: 7px;
+}
+
+.calendar-strip small {
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.calendar-strip .today {
+  color: #06100f;
+  background: var(--accent);
+}
+
+.calendar-strip .today small {
+  color: #06100f;
+}
+
+@media (max-width: 1050px) {
+  .desktop-widgets {
+    display: none;
+  }
+
+  .tray-button {
+    min-width: 38px;
+    padding: 0 7px;
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 720px) {
+  .task-view {
+    padding: 22px 12px 82px;
+  }
+
+  .task-view-grid {
+    grid-template-columns: 1fr;
+    grid-auto-rows: 190px;
+  }
+
+  .system-tray .tray-button:nth-child(-n + 2) {
+    display: none;
+  }
 }
 
 .window-button {
@@ -1315,6 +1649,12 @@ body.dock-visible .taskbar,
     linear-gradient(135deg, rgba(51, 224, 194, 0.08), transparent 26%),
     linear-gradient(315deg, rgba(255, 95, 162, 0.08), transparent 34%),
     rgba(10, 13, 20, 0.92);
+}
+
+.app-window[data-app="settings"].snapped {
+  position: absolute;
+  inset: auto !important;
+  resize: both;
 }
 
 .app-window[data-app="settings"] .window-body {
